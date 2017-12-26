@@ -156,7 +156,7 @@ public class TestOperation extends TestCase {
 		configuration.addFolder(folder);
 		Execution execution = new Execution();
 		List<PError> candidateErrors = execution.execute(configuration);
-		MissingDirError e1 = new MissingDirError(folder);
+		MissingDirError e1 = new MissingDirError(folder, "not relevant");
 		List<PError> referenceErrors = new ArrayList<PError>();
 		referenceErrors.add(e1);
 		compareErrors("test", referenceErrors, referenceErrors);

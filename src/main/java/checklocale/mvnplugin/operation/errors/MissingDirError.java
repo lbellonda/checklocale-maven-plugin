@@ -23,13 +23,16 @@ public class MissingDirError extends PError {
 
 	private String dirName;
 
-	public MissingDirError(final String newDirName) {
+	private String absolutePath;
+
+	public MissingDirError(final String newDirName, final String newAabsolutePath) {
 		dirName = newDirName;
+		absolutePath = newAabsolutePath;
 	}
 
 	@Override
 	public String toString() {
-		return "Error: directory " + dirName + " can't be found.";
+		return "Error: directory " + dirName + " can't be found. Absolute path:" + absolutePath;
 	}
 
 	@Override
@@ -53,6 +56,14 @@ public class MissingDirError extends PError {
 
 	public void setDirName(String dirName) {
 		this.dirName = dirName;
+	}
+
+	public String getAbsolutePath() {
+		return absolutePath;
+	}
+
+	public void setAbsolutePath(String absolutePath) {
+		this.absolutePath = absolutePath;
 	}
 
 }

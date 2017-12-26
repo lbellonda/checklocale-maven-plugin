@@ -1,4 +1,5 @@
-/*
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
  * Copyright 2017 Luca Bellonda.
  * 
  * Part of the checklocale project
@@ -15,43 +16,21 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
-
-package checklocale.mvnplugin.operation;
-
-import java.util.ArrayList;
-import java.util.List;
-
-public class Configuration {
-	private String encoding = "UTF-8";
-	private String baseDir;
-	private List<String> directories = new ArrayList<String>();
-
-	public String getEncoding() {
-		return encoding;
-	}
-
-	public void setEncoding(String encoding) {
-		this.encoding = encoding;
-	}
-
-	public List<String> getDirectories() {
-		return directories;
-	}
-
-	public void setDirectories(List<String> directories) {
-		this.directories = directories;
-	}
-
-	public void addFolder(String folder) {
-		directories.add(folder);
-	}
-
-	public String getBaseDir() {
-		return baseDir;
-	}
-
-	public void setBaseDir(String baseDir) {
-		this.baseDir = baseDir;
-	}
-}
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>checklocale-maven-plugin</groupId>
+	<artifactId>sample-project-parent</artifactId>
+	<version>1.0</version>
+    <packaging>pom</packaging>
+	<name>sample-multi-project</name>
+	<description>Sample Parent</description>
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+	</properties>
+    
+    <modules>
+        <module>ok</module>
+    </modules>
+</project>

@@ -53,6 +53,13 @@ public class CPMojo
      */
 	private String[] directories;
 	
+    /**
+     * Project folder
+    * @parameter default-value="${basedir}"
+    * @readonly
+    */
+	private String projectBaseDir;
+	
     public void execute()
         throws MojoExecutionException, MojoFailureException
     {
@@ -62,6 +69,7 @@ public class CPMojo
 	    	
 	    	getLog().debug(MOJO_NAME +" parameters:");
 	    	getLog().debug("   encoding:"+encoding);
+	    	getLog().debug("   baseDir:"+projectBaseDir);
 	    	List<String> folders = getListFromFolders();
 	    	if( (null == directories) || (directories.length==0)) {
 	    		getLog().debug(MOJO_NAME +" no folders to check.");
@@ -72,6 +80,7 @@ public class CPMojo
 	    		configuration.setEncoding(encoding);
 	    	}
 	    	configuration.setDirectories(folders);
+	    	configuration.setBaseDir(projectBaseDir);
 	    	getLog().debug(MOJO_NAME +" starting execution");
 	    	Execution execution = new Execution();
 	    	List<PError> errors = execution.execute(configuration);

@@ -157,13 +157,19 @@ public class Execution {
 
 	protected ReadDirInfoResult readData(Configuration configuration, String folder) {
 		ReadDirInfoResult result = new ReadDirInfoResult();
-		File baseDir = new File(folder);
+		String projectBaseDir = configuration.getBaseDir();
+		File baseDir = null ;
+		if( null != projectBaseDir ) {
+			baseDir = new File(projectBaseDir, folder);
+		} else {
+			baseDir = new File(folder);
+		}
 		File[] dirs = null;
 		if (baseDir.exists() && baseDir.isDirectory()) {
 			dirs = baseDir.listFiles();
 		}
 		if (null == dirs) {
-			MissingDirError error = new MissingDirError(folder);
+			MissingDirError error = new MissingDirError(folder, baseDir.getAbsolutePath());
 			result.addError(error);
 			return result;
 		}
