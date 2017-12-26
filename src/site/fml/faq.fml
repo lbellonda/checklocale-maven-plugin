@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<faqs id="FAQ" title="Frequently Asked Questions">
+  <part id="General">
+    <faq id="question1">
+      <question>Can I have a different number of files in different localizations?</question>
+      <answer>
+        <p>
+          No, the localization must contain the same number of files.
+        </p>
+      </answer>
+    </faq>
+    <faq id="question2">
+      <question>Can the folder be empty?</question>
+      <answer>
+        <p>
+          Yes
+        </p>
+      </answer>
+    </faq>
+  </part>
+</faqs>

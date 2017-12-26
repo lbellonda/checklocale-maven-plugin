@@ -1,0 +1,43 @@
+Check Properties Maven Mojo
+
+  The checklocale plugin is used to check if localizations stored in properties files stored in folders contain the same keys and no
+  duplicate exist.
+  Given a set of folders, subfolders are scanned to extract the keys.
+  The expected folder structure is as follows:
+
+  localizations
+     |
+     |
+     +--en_US
+     |       |
+     |       + strings.properties
+     |       + errors.properties
+     |
+     +--it_IT
+            |
+            + strings.properties
+            + errors.properties
+            
+  Files with the same name will be compared in en_US and it_IT subfolders.
+  
+  The goal is checklocale and a sample usage is outlined here:
+  
+  			<plugin>
+				<groupId>checklocale-maven-plugin</groupId>
+				<artifactId>checklocale</artifactId>
+				<version>CURRENT_VERSION</version>
+				<executions>
+					<execution>
+						<id>one</id>
+						<goals>
+							<goal>checklocale</goal>
+						</goals>
+						<configuration>
+							<encoding>UTF-8</encoding>
+							<directories>
+								<directory>src/main/resources/locale</directory>
+							</directories>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
