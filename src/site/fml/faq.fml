@@ -17,5 +17,13 @@
         </p>
       </answer>
     </faq>
+    <faq id="question3">
+      <question>How to get the errors report without stopping the build?</question>
+      <answer>
+        <p>
+          Set the "errors" parameter to false.
+        </p>
+      </answer>
+    </faq>
   </part>
 </faqs>

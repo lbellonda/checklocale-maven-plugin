@@ -51,6 +51,7 @@ localizations
 +------
 
   Files with the same name will be compared in en_US and it_IT subfolders.
+  There is the possibility to configure the plugin to report errors as warnings, to avoid blocking the build.
 
 * Goals Overview
 

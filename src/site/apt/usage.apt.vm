@@ -31,7 +31,7 @@
 Configuring Plugin
 
   Create an "execution", then set the goal to "checklocale". In the configuration you can specify one optional encoding and
-  a list of directories to check. Default encoding is UTF-8.
+  a list of directories to check. Default encoding is UTF-8. An optional parameter, errors, boolean, can be used to get the report of the errors without stopping the build.
 
   Here a sample of the configuration
 
@@ -54,5 +54,30 @@ Configuring Plugin
   </execution>
 </executions>
 +-----
+
+Listing errors as warnings
+
+  To reports errors as warnings use this configuration (note the "errors" parameter):
+
++----
+<executions>
+  <execution>
+   <id>one</id>
+    <goals>
+      <goal>checklocale</goal>
+    </goals>
+     <configuration>
+     	<errors>false</errors>
+    	<encoding>UTF-8</encoding>
+    	<directories>
+    		<directory>src/main/resources/locale</directory>
+    		<directory>optional/folder2</directory>
+    		<directory>optional/folder3</directory>
+    	</directories>
+    </configuration>
+  </execution>
+</executions>
++-----
+
 
 []
