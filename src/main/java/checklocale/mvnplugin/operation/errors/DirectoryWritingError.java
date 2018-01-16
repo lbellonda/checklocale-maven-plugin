@@ -17,17 +17,34 @@
  * limitations under the License.
  */
 
-package checklocale.mvnplugin.operation;
+package checklocale.mvnplugin.operation.errors;
 
-import checklocale.mvnplugin.operation.model.DirInfoModel;
+public class DirectoryWritingError extends PError {
 
-public class DirInfo extends DirInfoModel {
+	private String folderName;
 
-	public void addFile(FileInfo fileInfo) {
-		files.add(fileInfo);
-
+	public DirectoryWritingError(String newFolderName) {
+		folderName = newFolderName;
 	}
-	public boolean isBaseLocale(final String testLocale) {
-		return locale.equals(testLocale);
+
+	@Override
+	public String toString() {
+		return "Error: writing into folder " + folderName;
 	}
+
+	@Override
+	public boolean compareTo(PError other) {
+		if (other == null) {
+			return false;
+		}
+		if (!(other instanceof DirectoryWritingError)) {
+			return false;
+		}
+		DirectoryWritingError otherError = (DirectoryWritingError) other;
+		if (!folderName.equals(otherError.folderName)) {
+			return false;
+		}
+		return true;
+	}
+
 }

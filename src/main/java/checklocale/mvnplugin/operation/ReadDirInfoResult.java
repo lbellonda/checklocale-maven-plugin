@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 Luca Bellonda.
+ * Copyright 2017-2018 Luca Bellonda.
  * 
  * Part of the checklocale project
  * See the NOTICE file distributed with this work for additional information 
@@ -22,7 +22,6 @@ package checklocale.mvnplugin.operation;
 import java.util.ArrayList;
 import java.util.List;
 
-import checklocale.mvnplugin.operation.errors.MissingDirError;
 import checklocale.mvnplugin.operation.errors.PError;
 
 public class ReadDirInfoResult {
@@ -45,7 +44,7 @@ public class ReadDirInfoResult {
 		this.errors = value;
 	}
 
-	public void addError(MissingDirError error) {
+	public void addError(PError error) {
 		errors.add(error);
 	}
 

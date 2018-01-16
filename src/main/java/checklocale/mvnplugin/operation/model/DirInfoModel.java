@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 Luca Bellonda.
+ * Copyright 2017-2018 Luca Bellonda.
  * 
  * Part of the checklocale project
  * See the NOTICE file distributed with this work for additional information 
@@ -22,10 +22,13 @@ package checklocale.mvnplugin.operation.model;
 import java.util.ArrayList;
 import java.util.List;
 
+import checklocale.mvnplugin.operation.FileInfo;
+
 public class DirInfoModel {
 
+	protected String locale;
 	protected String name;
-	protected List<FileInfoModel> files = new ArrayList<FileInfoModel>();
+	protected List<FileInfo> files = new ArrayList<FileInfo>();
 
 	public String getName() {
 		return name;
@@ -35,12 +38,20 @@ public class DirInfoModel {
 		this.name = name;
 	}
 
-	public List<FileInfoModel> getFiles() {
+	public List<FileInfo> getFiles() {
 		return files;
 	}
 
-	public void setFiles(List<FileInfoModel> files) {
+	public void setFiles(List<FileInfo> files) {
 		this.files = files;
+	}
+
+	public String getLocale() {
+		return locale;
+	}
+
+	public void setLocale(String locale) {
+		this.locale = locale;
 	}
 
 }

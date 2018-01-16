@@ -19,15 +19,6 @@
 
 package checklocale.mvnplugin.operation;
 
-import checklocale.mvnplugin.operation.model.DirInfoModel;
-
-public class DirInfo extends DirInfoModel {
-
-	public void addFile(FileInfo fileInfo) {
-		files.add(fileInfo);
-
-	}
-	public boolean isBaseLocale(final String testLocale) {
-		return locale.equals(testLocale);
-	}
+public enum LayoutType {
+	MULTIPLE, SINGLE,
 }

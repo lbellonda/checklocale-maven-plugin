@@ -19,20 +19,19 @@
 
 package checklocale.mvnplugin.operation.errors;
 
-public class MissingDirError extends PError {
-
+public class MalformedFileNameError extends PError {
 	private String dirName;
 
-	private String absolutePath;
+	private String fileName;
 
-	public MissingDirError(final String newDirName, final String newAbsolutePath) {
+	public MalformedFileNameError(final String newDirName, final String newFileName) {
 		dirName = newDirName;
-		absolutePath = newAbsolutePath;
+		fileName = newFileName;
 	}
 
 	@Override
 	public String toString() {
-		return "Error: directory " + dirName + " can't be found. Absolute path:" + absolutePath;
+		return "Error: malformed filename (expected locale code) " + fileName + " in folder: " + dirName;
 	}
 
 	@Override
@@ -40,11 +39,14 @@ public class MissingDirError extends PError {
 		if (other == null) {
 			return false;
 		}
-		if (!(other instanceof MissingDirError)) {
+		if (!(other instanceof MalformedFileNameError)) {
 			return false;
 		}
-		MissingDirError otherError = (MissingDirError) other;
+		MalformedFileNameError otherError = (MalformedFileNameError) other;
 		if (!dirName.equals(otherError.dirName)) {
+			return false;
+		}
+		if (!fileName.equals(otherError.fileName)) {
 			return false;
 		}
 		return true;
@@ -56,14 +58,6 @@ public class MissingDirError extends PError {
 
 	public void setDirName(String dirName) {
 		this.dirName = dirName;
-	}
-
-	public String getAbsolutePath() {
-		return absolutePath;
-	}
-
-	public void setAbsolutePath(String absolutePath) {
-		this.absolutePath = absolutePath;
 	}
 
 }

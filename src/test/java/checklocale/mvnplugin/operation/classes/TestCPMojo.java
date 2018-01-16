@@ -16,18 +16,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+ 
+package checklocale.mvnplugin.operation.classes;
 
-package checklocale.mvnplugin.operation;
+import checklocale.mvnplugin.CPMojo;
 
-import checklocale.mvnplugin.operation.model.DirInfoModel;
-
-public class DirInfo extends DirInfoModel {
-
-	public void addFile(FileInfo fileInfo) {
-		files.add(fileInfo);
-
-	}
-	public boolean isBaseLocale(final String testLocale) {
-		return locale.equals(testLocale);
-	}
+public class TestCPMojo extends CPMojo {
+	// TODO
 }

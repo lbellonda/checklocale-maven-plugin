@@ -19,20 +19,20 @@
 
 package checklocale.mvnplugin.operation.errors;
 
-public class MissingDirError extends PError {
+public class NoLocaleFoundError extends PError {
 
 	private String dirName;
 
 	private String absolutePath;
 
-	public MissingDirError(final String newDirName, final String newAbsolutePath) {
+	public NoLocaleFoundError(final String newDirName, final String newAbsolutePath) {
 		dirName = newDirName;
 		absolutePath = newAbsolutePath;
 	}
 
 	@Override
 	public String toString() {
-		return "Error: directory " + dirName + " can't be found. Absolute path:" + absolutePath;
+		return "Error: directory " + dirName + " no localizations found. Absolute path:" + absolutePath;
 	}
 
 	@Override
@@ -40,10 +40,10 @@ public class MissingDirError extends PError {
 		if (other == null) {
 			return false;
 		}
-		if (!(other instanceof MissingDirError)) {
+		if (!(other instanceof NoLocaleFoundError)) {
 			return false;
 		}
-		MissingDirError otherError = (MissingDirError) other;
+		NoLocaleFoundError otherError = (NoLocaleFoundError) other;
 		if (!dirName.equals(otherError.dirName)) {
 			return false;
 		}

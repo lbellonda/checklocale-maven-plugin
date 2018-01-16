@@ -17,17 +17,34 @@
  * limitations under the License.
  */
 
-package checklocale.mvnplugin.operation;
+package checklocale.mvnplugin.operation.errors;
 
-import checklocale.mvnplugin.operation.model.DirInfoModel;
+public class ErrorNoLocaleFound extends PError {
 
-public class DirInfo extends DirInfoModel {
+	private String folder;
 
-	public void addFile(FileInfo fileInfo) {
-		files.add(fileInfo);
-
+	public ErrorNoLocaleFound(String newFolder) {
+		folder = newFolder;
 	}
-	public boolean isBaseLocale(final String testLocale) {
-		return locale.equals(testLocale);
+
+	@Override
+	public String toString() {
+		return "Error: no localization data for folder folder '" + folder + "'";
 	}
+
+	@Override
+	public boolean compareTo(PError other) {
+		if (other == null) {
+			return false;
+		}
+		if (!(other instanceof ErrorNoLocaleFound)) {
+			return false;
+		}
+		ErrorNoLocaleFound otherError = (ErrorNoLocaleFound) other;
+		if (!folder.equals(otherError.folder)) {
+			return false;
+		}
+		return true;
+	}
+
 }

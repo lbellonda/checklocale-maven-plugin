@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 Luca Bellonda.
+ * Copyright 2017-2018 Luca Bellonda.
  * 
  * Part of the checklocale project
  * See the NOTICE file distributed with this work for additional information 
@@ -19,27 +19,48 @@
 
 package checklocale.mvnplugin.operation;
 
-import checklocale.mvnplugin.operation.model.DirInfoModel;
 import checklocale.mvnplugin.operation.model.FileInfoModel;
-import checklocale.mvnplugin.operation.model.PropInfoModel;
 
 public class FileInfo extends FileInfoModel {
 
-	public FileInfo(DirInfoModel newDirInfo) {
+	public FileInfo(DirInfo newDirInfo) {
 		super(newDirInfo);
 	}
 
-	public void addKey(String key, int lineNo) {
-		PropInfoModel property = null;
+	@Deprecated
+	public void addKey(String key, String value, int lineNo) {
+		PropInfo property = null;
 		if (properties.containsKey(key)) {
 			property = properties.get(key);
-			property.getRedefinitions().add(lineNo);
+			PropInfo duplicatedProperty = newProperty(key, value, lineNo);
+			property.getRedefinitions().add(duplicatedProperty);
 		} else {
-			property = new PropInfoModel();
-			property.setKey(key);
-			property.setLineDefined(lineNo);
+			property = newProperty(key, value, lineNo);
 			properties.put(key, property);
+			itemsSorted.add(property);
 		}
+	}
+
+	public void addInfo(PropInfo newModel) {
+		if (properties.containsKey(newModel.getKey())) {
+			PropInfo property = properties.get(newModel.getKey());
+			property.getRedefinitions().add(newModel);
+		} else {
+			properties.put(newModel.getKey(), newModel);
+			itemsSorted.add(newModel);
+		}
+	}
+
+	private PropInfo newProperty(String key, String value, int lineNo) {
+		PropInfo property = new PropInfo();
+		property.setKey(key);
+		property.setLineDefined(lineNo);
+		property.setValue(value);
+		return property;
+	}
+
+	public boolean hasMissingItems() {
+		return !missingItems.isEmpty();
 	}
 
 }

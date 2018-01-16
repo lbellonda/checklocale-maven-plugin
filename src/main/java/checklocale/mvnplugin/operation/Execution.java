@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 Luca Bellonda.
+ * Copyright 2017-2018 Luca Bellonda.
  * 
  * Part of the checklocale project
  * See the NOTICE file distributed with this work for additional information 
@@ -28,12 +28,12 @@ import org.apache.commons.io.FileUtils;
 
 import checklocale.mvnplugin.operation.errors.DuplicateKeyError;
 import checklocale.mvnplugin.operation.errors.IOReadError;
+import checklocale.mvnplugin.operation.errors.MalformedFileNameError;
 import checklocale.mvnplugin.operation.errors.MissingDirError;
 import checklocale.mvnplugin.operation.errors.MissingFileError;
 import checklocale.mvnplugin.operation.errors.MissingKeyError;
+import checklocale.mvnplugin.operation.errors.NoLocaleFoundError;
 import checklocale.mvnplugin.operation.errors.PError;
-import checklocale.mvnplugin.operation.model.FileInfoModel;
-import checklocale.mvnplugin.operation.model.PropInfoModel;
 
 public class Execution {
 
@@ -46,17 +46,21 @@ public class Execution {
 	}
 
 	protected List<PError> execute(Configuration configuration, String folder) {
-		List<PError> errors = new ArrayList<PError>();
-		ReadDirInfoResult result = readData(configuration, folder);
-		errors.addAll(result.getErrors());
-		if (!errors.isEmpty()) {
-			return result.getErrors();
+		SingleExecution execution = new SingleExecution(configuration);
+		execution.setFolderName(folder);
+		ReadDirInfoResult result = readData(configuration, execution, folder);
+		execution.addErrors(result.getErrors());
+		if (!execution.getErrors().isEmpty()) {
+			return execution.getErrors();
 		}
 		List<DirInfo> dirs = result.getFolders();
-		errors.addAll(checkFileExsistence(dirs));
-		errors.addAll(checkDuplicateItems(dirs));
-		errors.addAll(checkMissingItems(dirs));
-		return errors;
+		execution.setDirs(dirs);
+		execution.addErrors(checkFileExsistence(dirs));
+		execution.addErrors(checkDuplicateItems(dirs));
+		execution.addErrors(checkMissingItems(execution, dirs));
+		RewriteEngine rewriteEngine = new RewriteEngine();
+		rewriteEngine.writeOutInfo(execution);
+		return execution.getErrors();
 	}
 
 	protected List<PError> checkFileExsistence(List<DirInfo> dirs) {
@@ -64,9 +68,9 @@ public class Execution {
 		for (DirInfo reference : dirs) {
 			for (DirInfo candidate : dirs) {
 				if (!reference.getName().equals(candidate.getName())) {
-					for (FileInfoModel referenceFile : reference.getFiles()) {
+					for (FileInfo referenceFile : reference.getFiles()) {
 						boolean found = false;
-						for (FileInfoModel candidateFile : candidate.getFiles()) {
+						for (FileInfo candidateFile : candidate.getFiles()) {
 							if (candidateFile.getName().equals(referenceFile.getName())) {
 								found = true;
 								break;
@@ -93,20 +97,20 @@ public class Execution {
 
 	protected List<PError> checkDuplicateItems(DirInfo dirInfo) {
 		List<PError> errors = new ArrayList<PError>();
-		for (FileInfoModel fileInfo : dirInfo.getFiles()) {
+		for (FileInfo fileInfo : dirInfo.getFiles()) {
 			errors.addAll(checkDuplicateItems(fileInfo));
 		}
 		return errors;
 	}
 
-	protected List<PError> checkDuplicateItems(FileInfoModel fileInfo) {
+	protected List<PError> checkDuplicateItems(FileInfo fileInfo) {
 		List<PError> errors = new ArrayList<PError>();
-		for (PropInfoModel propInfo : fileInfo.getProperties().values()) {
+		for (PropInfo propInfo : fileInfo.getProperties().values()) {
 			if (!propInfo.getRedefinitions().isEmpty()) {
 				DuplicateKeyError duplicateKeyError = new DuplicateKeyError(fileInfo.getFolderName(),
 						fileInfo.getName(), propInfo.getKey(), propInfo.getLineDefined());
-				for (int redefinition : propInfo.getRedefinitions()) {
-					duplicateKeyError.addRedefinition(redefinition);
+				for (PropInfo redefinition : propInfo.getRedefinitions()) {
+					duplicateKeyError.addRedefinition(redefinition.getLineDefined());
 				}
 				errors.add(duplicateKeyError);
 			}
@@ -114,23 +118,31 @@ public class Execution {
 		return errors;
 	}
 
-	protected List<PError> checkMissingItems(List<DirInfo> dirs) {
+	protected List<PError> checkMissingItems(SingleExecution execution, List<DirInfo> dirs) {
+		Configuration configuration = execution.getConfiguration();
 		List<PError> errors = new ArrayList<PError>();
+
 		for (DirInfo dirInfo : dirs) {
+			// First use the reference
+			DirInfo baseReference = execution.getBaseLocaleExcludingCurrentIfLocale(dirInfo.getLocale());
+			if (null != baseReference) {
+				errors.addAll(checkMissingItems(configuration, dirInfo, baseReference));
+			}
+			// then check the other locales
 			for (DirInfo target : dirs) {
 				if (!dirInfo.getName().equals(target.getName())) {
-					errors.addAll(checkMissingItems(dirInfo, target));
+					errors.addAll(checkMissingItems(configuration, dirInfo, target));
 				}
 			}
 		}
 		return errors;
 	}
 
-	private List<PError> checkMissingItems(DirInfo reference, DirInfo candidate) {
+	private List<PError> checkMissingItems(Configuration configuration, DirInfo reference, DirInfo candidate) {
 		List<PError> errors = new ArrayList<PError>();
-		for (FileInfoModel referenceFile : reference.getFiles()) {
-			for (FileInfoModel candidateFile : candidate.getFiles()) {
-				if (candidateFile.getName().equals(referenceFile.getName())) {
+		for (FileInfo referenceFile : reference.getFiles()) {
+			for (FileInfo candidateFile : candidate.getFiles()) {
+				if (candidateFile.getToken().equals(referenceFile.getToken())) {
 					errors.addAll(checkMissingItems(referenceFile, candidateFile));
 				}
 			}
@@ -138,65 +150,144 @@ public class Execution {
 		return errors;
 	}
 
-	private List<PError> checkMissingItems(FileInfoModel referenceFile, FileInfoModel candidateFile) {
+	private List<PError> checkMissingItems(FileInfo referenceFile, FileInfo candidateFile) {
 		List<PError> errors = new ArrayList<PError>();
 		for (String key : referenceFile.getProperties().keySet()) {
 			if (!candidateFile.getProperties().containsKey(key)) {
-				PropInfoModel propInfo = referenceFile.getProperties().get(key);
-				MissingKeyError missingKeyError = new MissingKeyError();
-				missingKeyError.setFolder(candidateFile.getFolderName());
-				missingKeyError.setFile(candidateFile.getName());
-				missingKeyError.setKey(key);
-				missingKeyError.setReferenceFolder(referenceFile.getFolderName());
-				missingKeyError.setDefinedAt(propInfo.getLineDefined());
-				errors.add(missingKeyError);
+				if (!candidateFile.getMissingItems().containsKey(key)) {
+					PropInfo propInfo = referenceFile.getProperties().get(key);
+					candidateFile.addMissingItem(propInfo);
+					MissingKeyError missingKeyError = new MissingKeyError();
+					missingKeyError.setFolder(candidateFile.getFolderName());
+					missingKeyError.setFile(candidateFile.getName());
+					missingKeyError.setKey(key);
+					missingKeyError.setReferenceFolder(referenceFile.getFolderName());
+					missingKeyError.setDefinedAt(propInfo.getLineDefined());
+					errors.add(missingKeyError);
+				}
 			}
 		}
 		return errors;
 	}
 
-	protected ReadDirInfoResult readData(Configuration configuration, String folder) {
+	protected ReadDirInfoResult readData(Configuration configuration, SingleExecution data, String folder) {
 		ReadDirInfoResult result = new ReadDirInfoResult();
 		String projectBaseDir = configuration.getBaseDir();
-		File baseDir = null ;
-		if( null != projectBaseDir ) {
+		File baseDir = null;
+		if (null != projectBaseDir) {
 			baseDir = new File(projectBaseDir, folder);
 		} else {
 			baseDir = new File(folder);
 		}
-		File[] dirs = null;
+		File[] filesOfMainFolder = null;
 		if (baseDir.exists() && baseDir.isDirectory()) {
-			dirs = baseDir.listFiles();
+			filesOfMainFolder = baseDir.listFiles();
 		}
-		if (null == dirs) {
+		if (null == filesOfMainFolder) {
 			MissingDirError error = new MissingDirError(folder, baseDir.getAbsolutePath());
 			result.addError(error);
 			return result;
 		}
-		for (File subDir : dirs) {
-			if (subDir.isDirectory()) {
-				DirInfo dirInfo = new DirInfo();
-				dirInfo.setName(subDir.getName());
-				result.addFolder(dirInfo);
-				result.getErrors().addAll(readSubDir(configuration, dirInfo, subDir));
-			}
+
+		if (configuration.getLayoutType() == LayoutType.MULTIPLE) {
+			readDataLayoutMultiple(configuration, data, folder, result, filesOfMainFolder, baseDir);
+		} else {
+			throw new RuntimeException("TODO");
+			// readDataLayoutSingle( configuration, data, folder, result,
+			// filesOfMainFolder);
+		}
+		if (!data.isHasData()) {
+			NoLocaleFoundError error = new NoLocaleFoundError(folder, baseDir.getAbsolutePath());
+			result.addError(error);
+			return result;
 		}
 		return result;
 	}
 
-	private List<PError> readSubDir(Configuration configuration, DirInfo dirInfo, File folderFile) {
+	// protected ReadDirInfoResult readDataLayoutSingle(Configuration
+	// configuration, ExecutionData data, String folder, ReadDirInfoResult
+	// result, File[] dirs) {
+	// ReadDirInfoResult result = new ReadDirInfoResult();
+	// String projectBaseDir = configuration.getBaseDir();
+	// Map<String,DirInfo> locales = new HashMap<String,DirInfo>();
+	// if(true) throw new RuntimeException("TODO");
+	// for (File subDir : dirs) {
+	// if (subDir.isFile()) {
+	// DirInfo dirInfo = new DirInfo();
+	// dirInfo.setName(subDir.getName());
+	// result.addFolder(dirInfo);
+	// result.getErrors().addAll(readSubDir(configuration, dirInfo, subDir));
+	// }
+	// }
+	// return result;
+	// }
+
+	protected ReadDirInfoResult readDataLayoutMultiple(Configuration configuration, SingleExecution data, String folder,
+			ReadDirInfoResult result, File[] dirs, File baseDir) {
+		for (File subDir : dirs) {
+			if (subDir.isDirectory()) {
+				DirInfo dirInfo = new DirInfo();
+				dirInfo.setName(subDir.getName());
+				dirInfo.setLocale(subDir.getName());
+				result.addFolder(dirInfo);
+				result.getErrors().addAll(readSubDir(configuration, data, dirInfo, subDir));
+			}
+		}
+		// if(!data.isHasData()) {
+		// NoLocaleFoundError error = new NoLocaleFoundError(folder,
+		// baseDir.getAbsolutePath());
+		// result.addError(error);
+		// return result;
+		// }
+		return result;
+	} // readDataLayoutMultiple()
+
+	private List<PError> readSubDir(Configuration configuration, SingleExecution data, DirInfo dirInfo,
+			File folderFile) {
 		List<PError> errors = new ArrayList<PError>();
 		File[] files = folderFile.listFiles();
 		for (File file : files) {
 			if (file.isFile()) {
 				FileInfo fileInfo = new FileInfo(dirInfo);
 				fileInfo.setName(file.getName());
+				if (configuration.isFileNameContainsLocaleCode()) {
+					String fileName = file.getName();
+					int indexOf = fileName.lastIndexOf(dirInfo.getLocale());
+					if (indexOf < 0) {
+						errors.add(new MalformedFileNameError(dirInfo.getName(), fileName));
+						continue;
+					}
+					String fileToken = fileName.substring(0, indexOf);
+					fileToken = fileName.substring(indexOf + dirInfo.getLocale().length());
+					fileInfo.setToken(fileToken);
+				} else {
+					fileInfo.setToken(file.getName());
+				}
 				dirInfo.addFile(fileInfo);
 				errors.addAll(readFile(configuration, fileInfo, file));
+				if (!fileInfo.getProperties().isEmpty()) {
+					data.setHasData(true);
+				}
 			}
 		}
 		return errors;
 	}
+
+	// private List<PError> readSubDirSingleFolder(Configuration configuration,
+	// DirInfo dirInfo, File folderFile) {
+	// List<PError> errors = new ArrayList<PError>();
+	// File[] files = folderFile.listFiles();
+	// for (File file : files) {
+	// // TODO attenzione alla strategia
+	// if (file.isFile()) {
+	// FileInfo fileInfo = new FileInfo(dirInfo);
+	// fileInfo.setName(file.getName());
+	// dirInfo.addFile(fileInfo);
+	// errors.addAll(readFile(configuration, fileInfo, file));
+	// }
+	// }
+	// return errors;
+	// }
 
 	private List<PError> readFile(Configuration configuration, FileInfo fileInfo, File dataFile) {
 		List<PError> errors = new ArrayList<PError>();
@@ -211,9 +302,10 @@ public class Execution {
 			int lineNo = 0;
 			for (String entry : lines) {
 				lineNo++;
-				final String key = extractKey(entry);
-				if (null != key) {
-					fileInfo.addKey(key, lineNo);
+				PropInfo propInfo = extractKey(entry);
+				if (null != propInfo) {
+					propInfo.setLineDefined(lineNo);
+					fileInfo.addInfo(propInfo);
 				}
 			}
 		} catch (Exception ex) {
@@ -223,9 +315,12 @@ public class Execution {
 		return errors;
 	} // readSubDir
 
-	protected String extractKey(final String input) {
-		if (null == input) {
+	protected PropInfo extractKey(String input) {
+		if ((null == input) || input.isEmpty()) {
 			return null;
+		}
+		if (input.charAt(0) == '\ufeff') {
+			input.substring(1);
 		}
 		String input2 = input.trim();
 		if (input2.startsWith("#")) {
@@ -237,7 +332,10 @@ public class Execution {
 			if (key.isEmpty()) {
 				return null;
 			}
-			return key.trim();
+			PropInfo propInfo = new PropInfo();
+			propInfo.setKey(key.trim());
+			propInfo.setValue(input2.substring(indexOfSep + 1));
+			return propInfo;
 		}
 		return null;
 	} // extractKey

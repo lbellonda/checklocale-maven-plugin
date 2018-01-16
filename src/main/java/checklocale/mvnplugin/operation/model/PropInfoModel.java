@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 Luca Bellonda.
+ * Copyright 2017-2018 Luca Bellonda.
  * 
  * Part of the checklocale project
  * See the NOTICE file distributed with this work for additional information 
@@ -22,11 +22,14 @@ package checklocale.mvnplugin.operation.model;
 import java.util.ArrayList;
 import java.util.List;
 
+import checklocale.mvnplugin.operation.PropInfo;
+
 public class PropInfoModel {
 
-	private String key;
-	private int lineDefined;
-	private List<Integer> redefinitions = new ArrayList<Integer>();
+	protected String key;
+	protected int lineDefined;
+	protected List<PropInfo> redefinitions = new ArrayList<PropInfo>();
+	protected String value;
 
 	public String getKey() {
 		return key;
@@ -44,11 +47,20 @@ public class PropInfoModel {
 		this.lineDefined = lineDefined;
 	}
 
-	public List<Integer> getRedefinitions() {
+	public List<PropInfo> getRedefinitions() {
 		return redefinitions;
 	}
 
-	public void setRedefinitions(List<Integer> redefinitions) {
+	public void setRedefinitions(List<PropInfo> redefinitions) {
 		this.redefinitions = redefinitions;
 	}
+
+	public String getValue() {
+		return value;
+	}
+
+	public void setValue(String value) {
+		this.value = value;
+	}
+
 }

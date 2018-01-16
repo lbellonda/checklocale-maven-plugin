@@ -17,17 +17,36 @@
  * limitations under the License.
  */
 
-package checklocale.mvnplugin.operation;
+package checklocale.mvnplugin.operation.errors;
 
-import checklocale.mvnplugin.operation.model.DirInfoModel;
+public class FileWritingError extends PError {
 
-public class DirInfo extends DirInfoModel {
+	private String fileName;
+	private String message;
 
-	public void addFile(FileInfo fileInfo) {
-		files.add(fileInfo);
-
+	public FileWritingError(String newFileName, String newMessage) {
+		fileName = newFileName;
+		message = newMessage;
 	}
-	public boolean isBaseLocale(final String testLocale) {
-		return locale.equals(testLocale);
+
+	@Override
+	public String toString() {
+		return "Error: writing file '" + fileName + "', cause: " + message;
 	}
+
+	@Override
+	public boolean compareTo(PError other) {
+		if (other == null) {
+			return false;
+		}
+		if (!(other instanceof FileWritingError)) {
+			return false;
+		}
+		FileWritingError otherError = (FileWritingError) other;
+		if (!fileName.equals(otherError.fileName)) {
+			return false;
+		}
+		return true;
+	}
+
 }

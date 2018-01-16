@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 Luca Bellonda.
+ * Copyright 2017-2018 Luca Bellonda.
  * 
  * Part of the checklocale project
  * See the NOTICE file distributed with this work for additional information 
@@ -19,16 +19,24 @@
 
 package checklocale.mvnplugin.operation.model;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+
+import checklocale.mvnplugin.operation.DirInfo;
+import checklocale.mvnplugin.operation.PropInfo;
 
 public class FileInfoModel {
 
-	protected DirInfoModel dirInfo;
+	protected DirInfo dirInfo;
 	protected String name;
-	protected Map<String, PropInfoModel> properties = new HashMap<String, PropInfoModel>();
+	protected String token;
+	protected Map<String, PropInfo> properties = new HashMap<String, PropInfo>();
+	protected List<PropInfo> itemsSorted = new ArrayList<PropInfo>();
+	protected Map<String, PropInfo> missingItems = new HashMap<String, PropInfo>();
 
-	public FileInfoModel(DirInfoModel newDirInfo) {
+	public FileInfoModel(DirInfo newDirInfo) {
 		dirInfo = newDirInfo;
 	}
 
@@ -40,16 +48,48 @@ public class FileInfoModel {
 		this.name = name;
 	}
 
-	public Map<String, PropInfoModel> getProperties() {
+	public Map<String, PropInfo> getProperties() {
 		return properties;
 	}
 
-	public void setProperties(Map<String, PropInfoModel> properties) {
+	public void setProperties(Map<String, PropInfo> properties) {
 		this.properties = properties;
 	}
 
 	public String getFolderName() {
 		return dirInfo.getName();
+	}
+
+	public DirInfoModel getDirInfo() {
+		return dirInfo;
+	}
+
+	public Map<String, PropInfo> getMissingItems() {
+		return missingItems;
+	}
+
+	public void setMissingItems(Map<String, PropInfo> missingItems) {
+		this.missingItems = missingItems;
+	}
+
+	public String getToken() {
+		return token;
+	}
+
+	public void setToken(String token) {
+		this.token = token;
+	}
+
+	public void addMissingItem(PropInfo propInfo) {
+		missingItems.put(propInfo.getKey(), propInfo);
+	}
+
+	public List<PropInfo> getItemsSorted() {
+		return itemsSorted;
+	}
+
+	public void setItemsSorted(List<PropInfo> itemsSorted) {
+		this.itemsSorted = itemsSorted;
 	}
 
 }

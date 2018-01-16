@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 Luca Bellonda.
+ * Copyright 2017-2018 Luca Bellonda.
  * 
  * Part of the checklocale project
  * See the NOTICE file distributed with this work for additional information 
@@ -26,6 +26,11 @@ public class Configuration {
 	private String encoding = "UTF-8";
 	private String baseDir;
 	private List<String> directories = new ArrayList<String>();
+	private LayoutType layoutType = LayoutType.MULTIPLE;
+	private boolean fileNameContainsLocaleCode;
+	private String outputFolder;
+	private String baseLocale;
+	private boolean errors = true;
 
 	public String getEncoding() {
 		return encoding;
@@ -53,5 +58,49 @@ public class Configuration {
 
 	public void setBaseDir(String baseDir) {
 		this.baseDir = baseDir;
+	}
+
+	public LayoutType getLayoutType() {
+		return layoutType;
+	}
+
+	public void setLayoutType(LayoutType layoutType) {
+		this.layoutType = layoutType;
+	}
+
+	public boolean isFileNameContainsLocaleCode() {
+		return fileNameContainsLocaleCode;
+	}
+
+	public void setFileNameContainsLocaleCode(boolean fileNameContainsLocaleCode) {
+		this.fileNameContainsLocaleCode = fileNameContainsLocaleCode;
+	}
+
+	public String getOutputFolder() {
+		return outputFolder;
+	}
+
+	public void setOutputFolder(String outputFolder) {
+		this.outputFolder = outputFolder;
+	}
+
+	public String getBaseLocale() {
+		return baseLocale;
+	}
+
+	public void setBaseLocale(String baseLocale) {
+		this.baseLocale = baseLocale;
+	}
+
+	public boolean isErrors() {
+		return errors;
+	}
+
+	public void setErrors(boolean errors) {
+		this.errors = errors;
+	}
+
+	public boolean hasBaseLocale() {
+		return (null != baseLocale) && !baseLocale.isEmpty();
 	}
 }

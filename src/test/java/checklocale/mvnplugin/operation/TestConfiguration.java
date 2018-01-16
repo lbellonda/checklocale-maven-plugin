@@ -19,15 +19,12 @@
 
 package checklocale.mvnplugin.operation;
 
-import checklocale.mvnplugin.operation.model.DirInfoModel;
+import junit.framework.TestCase;
 
-public class DirInfo extends DirInfoModel {
+public class TestConfiguration  extends TestCase {
 
-	public void addFile(FileInfo fileInfo) {
-		files.add(fileInfo);
-
-	}
-	public boolean isBaseLocale(final String testLocale) {
-		return locale.equals(testLocale);
+	public void testDefaultParameters()
+	{
+		//todo
 	}
 }
