@@ -126,12 +126,12 @@ public class Execution {
 			// First use the reference
 			DirInfo baseReference = execution.getBaseLocaleExcludingCurrentIfLocale(dirInfo.getLocale());
 			if (null != baseReference) {
-				errors.addAll(checkMissingItems(configuration, dirInfo, baseReference));
+				errors.addAll(checkMissingItems(configuration, baseReference, dirInfo));
 			}
 			// then check the other locales
 			for (DirInfo target : dirs) {
 				if (!dirInfo.getName().equals(target.getName())) {
-					errors.addAll(checkMissingItems(configuration, dirInfo, target));
+					errors.addAll(checkMissingItems(configuration, target, dirInfo));
 				}
 			}
 		}
