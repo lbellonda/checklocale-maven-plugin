@@ -31,7 +31,5 @@ public class PropInfo extends PropInfoModel {
 		sb.append(getKey());
 		sb.append("=");
 		sb.append(getValue());
-		sb.append("\n");
-
 	}
 }

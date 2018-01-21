@@ -28,6 +28,7 @@ import org.apache.commons.io.FileUtils;
 
 import checklocale.mvnplugin.operation.errors.DuplicateKeyError;
 import checklocale.mvnplugin.operation.errors.IOReadError;
+import checklocale.mvnplugin.operation.errors.InvalidEntryError;
 import checklocale.mvnplugin.operation.errors.MalformedFileNameError;
 import checklocale.mvnplugin.operation.errors.MissingDirError;
 import checklocale.mvnplugin.operation.errors.MissingFileError;
@@ -45,8 +46,13 @@ public class Execution {
 		return errors;
 	}
 
-	protected List<PError> execute(Configuration configuration, String folder) {
+	public SingleExecution createSingleExecution(Configuration configuration) {
 		SingleExecution execution = new SingleExecution(configuration);
+		return execution;
+	}
+
+	protected List<PError> execute(Configuration configuration, String folder) {
+		SingleExecution execution = createSingleExecution(configuration);
 		execution.setFolderName(folder);
 		ReadDirInfoResult result = readData(configuration, execution, folder);
 		execution.addErrors(result.getErrors());
@@ -58,8 +64,10 @@ public class Execution {
 		execution.addErrors(checkFileExsistence(dirs));
 		execution.addErrors(checkDuplicateItems(dirs));
 		execution.addErrors(checkMissingItems(execution, dirs));
-		RewriteEngine rewriteEngine = new RewriteEngine();
-		rewriteEngine.writeOutInfo(execution);
+		if (!configuration.isPreventOutput()) {
+			RewriteEngine rewriteEngine = new RewriteEngine();
+			rewriteEngine.writeOutInfo(execution);
+		}
 		return execution.getErrors();
 	}
 
@@ -71,7 +79,7 @@ public class Execution {
 					for (FileInfo referenceFile : reference.getFiles()) {
 						boolean found = false;
 						for (FileInfo candidateFile : candidate.getFiles()) {
-							if (candidateFile.getName().equals(referenceFile.getName())) {
+							if (candidateFile.getToken().equals(referenceFile.getToken())) {
 								found = true;
 								break;
 							}
@@ -189,13 +197,7 @@ public class Execution {
 			return result;
 		}
 
-		if (configuration.getLayoutType() == LayoutType.MULTIPLE) {
-			readDataLayoutMultiple(configuration, data, folder, result, filesOfMainFolder, baseDir);
-		} else {
-			throw new RuntimeException("TODO");
-			// readDataLayoutSingle( configuration, data, folder, result,
-			// filesOfMainFolder);
-		}
+		readDataLayoutMultiple(configuration, data, folder, result, filesOfMainFolder, baseDir);
 		if (!data.isHasData()) {
 			NoLocaleFoundError error = new NoLocaleFoundError(folder, baseDir.getAbsolutePath());
 			result.addError(error);
@@ -203,24 +205,6 @@ public class Execution {
 		}
 		return result;
 	}
-
-	// protected ReadDirInfoResult readDataLayoutSingle(Configuration
-	// configuration, ExecutionData data, String folder, ReadDirInfoResult
-	// result, File[] dirs) {
-	// ReadDirInfoResult result = new ReadDirInfoResult();
-	// String projectBaseDir = configuration.getBaseDir();
-	// Map<String,DirInfo> locales = new HashMap<String,DirInfo>();
-	// if(true) throw new RuntimeException("TODO");
-	// for (File subDir : dirs) {
-	// if (subDir.isFile()) {
-	// DirInfo dirInfo = new DirInfo();
-	// dirInfo.setName(subDir.getName());
-	// result.addFolder(dirInfo);
-	// result.getErrors().addAll(readSubDir(configuration, dirInfo, subDir));
-	// }
-	// }
-	// return result;
-	// }
 
 	protected ReadDirInfoResult readDataLayoutMultiple(Configuration configuration, SingleExecution data, String folder,
 			ReadDirInfoResult result, File[] dirs, File baseDir) {
@@ -233,12 +217,6 @@ public class Execution {
 				result.getErrors().addAll(readSubDir(configuration, data, dirInfo, subDir));
 			}
 		}
-		// if(!data.isHasData()) {
-		// NoLocaleFoundError error = new NoLocaleFoundError(folder,
-		// baseDir.getAbsolutePath());
-		// result.addError(error);
-		// return result;
-		// }
 		return result;
 	} // readDataLayoutMultiple()
 
@@ -258,7 +236,7 @@ public class Execution {
 						continue;
 					}
 					String fileToken = fileName.substring(0, indexOf);
-					fileToken = fileName.substring(indexOf + dirInfo.getLocale().length());
+					fileToken += fileName.substring(indexOf + dirInfo.getLocale().length());
 					fileInfo.setToken(fileToken);
 				} else {
 					fileInfo.setToken(file.getName());
@@ -273,22 +251,6 @@ public class Execution {
 		return errors;
 	}
 
-	// private List<PError> readSubDirSingleFolder(Configuration configuration,
-	// DirInfo dirInfo, File folderFile) {
-	// List<PError> errors = new ArrayList<PError>();
-	// File[] files = folderFile.listFiles();
-	// for (File file : files) {
-	// // TODO attenzione alla strategia
-	// if (file.isFile()) {
-	// FileInfo fileInfo = new FileInfo(dirInfo);
-	// fileInfo.setName(file.getName());
-	// dirInfo.addFile(fileInfo);
-	// errors.addAll(readFile(configuration, fileInfo, file));
-	// }
-	// }
-	// return errors;
-	// }
-
 	private List<PError> readFile(Configuration configuration, FileInfo fileInfo, File dataFile) {
 		List<PError> errors = new ArrayList<PError>();
 		List<String> lines = null;
@@ -302,10 +264,17 @@ public class Execution {
 			int lineNo = 0;
 			for (String entry : lines) {
 				lineNo++;
-				PropInfo propInfo = extractKey(entry);
-				if (null != propInfo) {
-					propInfo.setLineDefined(lineNo);
-					fileInfo.addInfo(propInfo);
+				ReadInfoResult result = extractKey(entry);
+				if (null != result) {
+					if (result.isError()) {
+						InvalidEntryError error = new InvalidEntryError(fileInfo.getName(), lineNo);
+						errors.add(error);
+					}
+					PropInfo propInfo = result.getPropInfo();
+					if (null != propInfo) {
+						fileInfo.addInfo(propInfo);
+						propInfo.setLineDefined(lineNo);
+					}
 				}
 			}
 		} catch (Exception ex) {
@@ -315,29 +284,44 @@ public class Execution {
 		return errors;
 	} // readSubDir
 
-	protected PropInfo extractKey(String input) {
+	/**
+	 * Returns null for no valid, result with error if error, else a propinfo
+	 * 
+	 * @param propInfo
+	 * @param input
+	 * @return
+	 */
+
+	protected ReadInfoResult extractKey(final String input) {
+		ReadInfoResult result = new ReadInfoResult();
+		result.setError(false);
 		if ((null == input) || input.isEmpty()) {
-			return null;
+			return result;
 		}
-		if (input.charAt(0) == '\ufeff') {
-			input.substring(1);
+		String rInput = input;
+		if (rInput.charAt(0) == '\ufeff') {
+			rInput = rInput.substring(1);
 		}
-		String input2 = input.trim();
-		if (input2.startsWith("#")) {
-			return null;
+		String input2 = rInput.trim();
+		if (input2.startsWith("#") || input2.startsWith("!")) {
+			return result;
 		}
 		int indexOfSep = input2.indexOf("=");
 		if (indexOfSep >= 0) {
 			String key = input2.substring(0, indexOfSep);
 			if (key.isEmpty()) {
-				return null;
+				result.setError(true);
+				return result;
 			}
 			PropInfo propInfo = new PropInfo();
 			propInfo.setKey(key.trim());
 			propInfo.setValue(input2.substring(indexOfSep + 1));
-			return propInfo;
+			result.setPropInfo(propInfo);
+			return result;
+		} else {
+			result.setError(true);
 		}
-		return null;
+		return result;
 	} // extractKey
 
 }

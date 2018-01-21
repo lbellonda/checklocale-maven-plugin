@@ -25,7 +25,6 @@ import org.apache.maven.plugin.MojoFailureException;
 
 import checklocale.mvnplugin.operation.Configuration;
 import checklocale.mvnplugin.operation.Execution;
-import checklocale.mvnplugin.operation.LayoutType;
 import checklocale.mvnplugin.operation.errors.PError;
 
 import java.util.ArrayList;
@@ -41,18 +40,8 @@ import java.util.List;
 public class CPMojo extends AbstractMojo {
 	private static final String MOJO_NAME = "CPMojo";
 
-	public static final String LAYOUT_MULTIPLE = "multiple";
-	public static final String LAYOUT_SINGLE = "single";
 	public static final String DEFAULT_FOLDER = "checklocale-maven-plugin";
 	public static final String DEFAULT_ENCODING = "UTF-8";
-
-	/**
-	 * The folder layout structure, multiple if each locale resided in its own
-	 * folder single if there is only one directory for all the locales
-	 * 
-	 * @parameter layout, defaultValue = multiple
-	 */
-	private String layout;
 
 	/**
 	 * Flag to declare that the localization file contains the code if the flag
@@ -62,36 +51,43 @@ public class CPMojo extends AbstractMojo {
 	 * 
 	 * @parameter fileNameContainsLocaleCode, defaultValue = false
 	 */
-	private boolean fileNameContainsLocaleCode = false;
+	protected boolean fileNameContainsLocaleCode = false;
 
 	/**
 	 * The output folder where the normalized data will be written it is a
 	 * subfolder of the target folder
 	 * 
-	 * @parameter layout, defaultValue = checklocale-maven-plugin
+	 * @parameter outputFolder, defaultValue = checklocale-maven-plugin
 	 */
-	private String outputFolder;
+	protected String outputFolder;
 
 	/**
 	 * The locale code for the locale to be taken as the base one.
 	 * 
 	 * @parameter baseLocale
 	 */
-	private String baseLocale;
+	protected String baseLocale;
 
 	/**
 	 * Flag to fire errors, if false only warnings will be issued
 	 * 
 	 * @parameter errors, defaultValue = true
 	 */
-	private boolean errors = true;
+	protected boolean errors = true;
+
+	/**
+	 * Flag to avoid output, if true no output will be generated
+	 * 
+	 * @parameter errors, defaultValue = false
+	 */
+	protected boolean preventOutput = false;
 
 	/**
 	 * Encoding of the properties
 	 * 
 	 * @parameter encoding, defaultValue = "UTF-8"
 	 */
-	private String encoding;
+	protected String encoding;
 
 	/**
 	 * Folders to check
@@ -99,7 +95,7 @@ public class CPMojo extends AbstractMojo {
 	 * @parameter directories
 	 * @required
 	 */
-	private String[] directories;
+	protected String[] directories;
 
 	/**
 	 * Project folder
@@ -107,15 +103,15 @@ public class CPMojo extends AbstractMojo {
 	 * @parameter default-value="${basedir}"
 	 * @readonly
 	 */
-	private String projectBaseDir;
+	protected String projectBaseDir;
 
 	/**
 	 * Project output folder
 	 * 
-	 * @parameter default-value="${build.directory}"
+	 * @parameter default-value="${project.build.directory}"
 	 * @readonly
 	 */
-	private String targetBaseDir;
+	protected String targetBaseDir;
 
 	public void execute() throws MojoExecutionException, MojoFailureException {
 		innerExecute();
@@ -128,7 +124,7 @@ public class CPMojo extends AbstractMojo {
 			Configuration configuration = setup();
 
 			getLog().debug(MOJO_NAME + " starting execution");
-			Execution execution = new Execution();
+			Execution execution = newExecution();
 			List<PError> errorsList = execution.execute(configuration);
 			if (errorsList.isEmpty()) {
 				getLog().info(MOJO_NAME + " end execution, no errors.");
@@ -151,6 +147,11 @@ public class CPMojo extends AbstractMojo {
 		}
 	}
 
+	protected Execution newExecution() {
+		Execution execution = new Execution();
+		return execution;
+	}
+
 	protected Configuration setup() throws MojoFailureException {
 		Configuration configuration = createConfiguration();
 		checkConfiguration(configuration);
@@ -171,11 +172,11 @@ public class CPMojo extends AbstractMojo {
 			getLog().debug("   errors: " + errors);
 			getLog().debug("   encoding: " + encoding);
 			getLog().debug("   baseDir: " + projectBaseDir);
-			getLog().debug("   layout: " + layout);
 			getLog().debug("   fileNameContainsLocaleCode: " + fileNameContainsLocaleCode);
 			getLog().debug("   outputFolder: " + outputFolder);
 			getLog().debug("   baseLocale: " + baseLocale);
 			getLog().debug("   targetBaseDir: " + targetBaseDir);
+			getLog().debug("   preventOutput: " + preventOutput);
 
 			getLog().debug("   folders:");
 			List<String> folders = getListFromFolders();
@@ -199,24 +200,24 @@ public class CPMojo extends AbstractMojo {
 			throw new MojoFailureException("no folders to check");
 		}
 		configuration.setDirectories(folders);
+		checkEmptyParam(projectBaseDir, "Invalid project directory");
 		configuration.setBaseDir(cleanParam(projectBaseDir));
 		configuration.setErrors(errors);
-		if ((layout == null) || layout.isEmpty() || layout.equalsIgnoreCase(LAYOUT_MULTIPLE)) {
-			configuration.setLayoutType(LayoutType.MULTIPLE);
-		} else if (layout.equalsIgnoreCase(LAYOUT_SINGLE)) {
-			configuration.setLayoutType(LayoutType.SINGLE);
-		} else {
-			throw new MojoFailureException("Layout, invalid configuration value:" + layout);
-		}
 		configuration.setFileNameContainsLocaleCode(fileNameContainsLocaleCode);
-		if ((null == targetBaseDir) || targetBaseDir.trim().isEmpty()) {
-			throw new MojoFailureException("Invalid build directory");
-		}
-		configuration.setOutputFolder(cleanParam(outputFolder, targetBaseDir + "/" + DEFAULT_FOLDER));
+		checkEmptyParam(targetBaseDir, "Invalid build directory");
+
+		configuration.setOutputFolder(targetBaseDir + "/" + cleanParam(outputFolder, DEFAULT_FOLDER));
 		configuration.setBaseLocale(cleanParam(baseLocale));
+		configuration.setPreventOutput(preventOutput);
 
 		return configuration;
 	} // createConfiguration
+
+	private void checkEmptyParam(String param, String message) throws MojoFailureException {
+		if ((null == param) || param.trim().isEmpty()) {
+			throw new MojoFailureException(message);
+		}
+	}
 
 	private String cleanParam(String param, String defaultValue) {
 		if (null != param) {
@@ -230,9 +231,7 @@ public class CPMojo extends AbstractMojo {
 	}
 
 	private void checkConfiguration(Configuration configuration) throws MojoFailureException {
-		if ((configuration.getLayoutType() == LayoutType.SINGLE) && !configuration.isFileNameContainsLocaleCode()) {
-			throw new MojoFailureException("Unsupported combination of layout and file name pattern");
-		}
+		// nothing
 	} // checkParameters()
 
 	private List<String> getListFromFolders() {

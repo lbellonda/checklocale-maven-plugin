@@ -19,6 +19,29 @@
 
 package checklocale.mvnplugin.operation;
 
-public enum LayoutType {
-	MULTIPLE, SINGLE,
+public class ReadInfoResult {
+
+	private boolean error = false;
+	private PropInfo propInfo;
+
+	public ReadInfoResult() {
+		//
+	}
+
+	public boolean isError() {
+		return error;
+	}
+
+	public void setError(boolean value) {
+		this.error = value;
+	}
+
+	public PropInfo getPropInfo() {
+		return propInfo;
+	}
+
+	public void setPropInfo(PropInfo propInfo) {
+		this.propInfo = propInfo;
+	}
+
 }

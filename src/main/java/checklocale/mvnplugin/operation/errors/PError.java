@@ -23,4 +23,8 @@ public abstract class PError {
 	public abstract String toString();
 
 	public abstract boolean compareTo(PError other);
+
+	public PError() {
+		// empty constructor
+	}
 }

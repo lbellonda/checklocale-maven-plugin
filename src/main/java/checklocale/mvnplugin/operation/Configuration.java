@@ -26,11 +26,11 @@ public class Configuration {
 	private String encoding = "UTF-8";
 	private String baseDir;
 	private List<String> directories = new ArrayList<String>();
-	private LayoutType layoutType = LayoutType.MULTIPLE;
 	private boolean fileNameContainsLocaleCode;
 	private String outputFolder;
 	private String baseLocale;
 	private boolean errors = true;
+	private boolean preventOutput = false;
 
 	public String getEncoding() {
 		return encoding;
@@ -58,14 +58,6 @@ public class Configuration {
 
 	public void setBaseDir(String baseDir) {
 		this.baseDir = baseDir;
-	}
-
-	public LayoutType getLayoutType() {
-		return layoutType;
-	}
-
-	public void setLayoutType(LayoutType layoutType) {
-		this.layoutType = layoutType;
 	}
 
 	public boolean isFileNameContainsLocaleCode() {
@@ -102,5 +94,13 @@ public class Configuration {
 
 	public boolean hasBaseLocale() {
 		return (null != baseLocale) && !baseLocale.isEmpty();
+	}
+
+	public boolean isPreventOutput() {
+		return preventOutput;
+	}
+
+	public void setPreventOutput(boolean preventOutput) {
+		this.preventOutput = preventOutput;
 	}
 }

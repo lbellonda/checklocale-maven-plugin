@@ -25,8 +25,8 @@ public class DirInfo extends DirInfoModel {
 
 	public void addFile(FileInfo fileInfo) {
 		files.add(fileInfo);
-
 	}
+
 	public boolean isBaseLocale(final String testLocale) {
 		return locale.equals(testLocale);
 	}

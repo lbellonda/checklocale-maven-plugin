@@ -39,6 +39,10 @@ public class SingleExecution {
 		configuration = newConfiguration;
 	}
 
+	public void setKey(String value) {
+		key = value;
+	}
+
 	public DirInfo getBaseLocaleExcludingCurrentIfLocale(String target) {
 		if (configuration.hasBaseLocale()) {
 			if (configuration.getBaseLocale().equals(target)) {

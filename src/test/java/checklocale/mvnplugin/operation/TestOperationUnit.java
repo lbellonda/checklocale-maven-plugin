@@ -26,13 +26,33 @@ public class TestOperationUnit extends TestCase {
 
 	public void testParsing() {
 		TestExecution op = new TestExecution();
-		assertEquals(null, op.extractKey(null));
-		assertEquals(null, op.extractKey(""));
-		assertEquals(null, op.extractKey("="));
-		assertEquals("1", op.extractKey("1="));
-		assertEquals("1", op.extractKey("1=2"));
-		assertEquals("abc.gg", op.extractKey("abc.gg = 2jdjd"));
-		assertEquals("abc.gg", op.extractKey(" abc.gg = 2jdjd"));
-		assertEquals(null, op.extractKey("#"));
+		assertEquals(null, op.testExtractKey(null));
+		assertEquals(null, op.testExtractKey(""));
+		assertEquals(null, op.testExtractKey("="));
+		assertEquals("1", op.testExtractKey("1="));
+		assertEquals("1", op.testExtractKey("1=2"));
+		assertEquals("abc.gg", op.testExtractKey("abc.gg = 2jdjd"));
+		assertEquals("abc.gg", op.testExtractKey(" abc.gg = 2jdjd"));
+		assertEquals(null, op.testExtractKey("#"));
+		assertEquals(null, op.testExtractKey("!"));
+		assertEquals(null, op.testExtractKey("# asda=as"));
+		assertEquals(null, op.testExtractKey("! asda=as"));
+	}
+
+	public void testRewrite() {
+		TestExecution op = new TestExecution();
+		assertEquals(null, op.testRewrite(null));
+		assertEquals(null, op.testRewrite(""));
+		assertEquals(null, op.testRewrite("!"));
+		assertEquals(null, op.testRewrite("#"));
+		assertEquals(null, op.testRewrite("# abc =12 3"));
+		assertEquals(null, op.testRewrite("! abc =12 3"));
+		assertEquals("1=", op.testRewrite("1="));
+		assertEquals("1=2", op.testRewrite("1=2"));
+		assertEquals("abc.gg= 2jdjd", op.testRewrite("abc.gg = 2jdjd"));
+		assertEquals("abc.gg= 2jdjd", op.testRewrite(" abc.gg = 2jdjd"));
+		assertEquals("abc.gg= 2 jdjd", op.testRewrite("\ufeffabc.gg = 2 jdjd")); // bom
+		assertEquals(null, op.testRewrite(" abc 12 3"));
+
 	}
 }

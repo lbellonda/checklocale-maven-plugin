@@ -27,20 +27,6 @@ public class FileInfo extends FileInfoModel {
 		super(newDirInfo);
 	}
 
-	@Deprecated
-	public void addKey(String key, String value, int lineNo) {
-		PropInfo property = null;
-		if (properties.containsKey(key)) {
-			property = properties.get(key);
-			PropInfo duplicatedProperty = newProperty(key, value, lineNo);
-			property.getRedefinitions().add(duplicatedProperty);
-		} else {
-			property = newProperty(key, value, lineNo);
-			properties.put(key, property);
-			itemsSorted.add(property);
-		}
-	}
-
 	public void addInfo(PropInfo newModel) {
 		if (properties.containsKey(newModel.getKey())) {
 			PropInfo property = properties.get(newModel.getKey());
@@ -51,7 +37,7 @@ public class FileInfo extends FileInfoModel {
 		}
 	}
 
-	private PropInfo newProperty(String key, String value, int lineNo) {
+	public static PropInfo newProperty(String key, String value, int lineNo) {
 		PropInfo property = new PropInfo();
 		property.setKey(key);
 		property.setLineDefined(lineNo);
@@ -61,6 +47,11 @@ public class FileInfo extends FileInfoModel {
 
 	public boolean hasMissingItems() {
 		return !missingItems.isEmpty();
+	}
+
+	public String toString() {
+		return "name: '" + name + "' token: '" + token + "' # props: " + ((null == properties) ? 0 : properties.size());
+
 	}
 
 }

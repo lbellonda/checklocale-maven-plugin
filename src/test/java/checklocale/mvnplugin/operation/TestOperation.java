@@ -41,6 +41,7 @@ public class TestOperation extends TestCase {
 	private FileInfo makeFileInfo(DirInfo dirInfo, String name) {
 		FileInfo fileInfo = new FileInfo(dirInfo);
 		fileInfo.setName(name);
+		fileInfo.setToken(name);
 		return fileInfo;
 	}
 
@@ -72,7 +73,8 @@ public class TestOperation extends TestCase {
 	}
 
 	private void addItemToFile(FileInfo f1a, String key, int lineNo) {
-		f1a.addKey(key, lineNo);
+		PropInfo propInfo = FileInfo.newProperty(key, "y", lineNo);
+		f1a.addInfo(propInfo);
 	}
 
 	public void testDuplicate() {
@@ -105,6 +107,8 @@ public class TestOperation extends TestCase {
 	}
 
 	public void testMissingKey() {
+		Configuration configuration = new Configuration();
+		SingleExecution execution = new SingleExecution(configuration);
 		DirInfo d1 = makeDirInfo("en_US");
 		DirInfo d2 = makeDirInfo("it_IT");
 		List<DirInfo> dirs = new ArrayList<DirInfo>();
@@ -123,7 +127,7 @@ public class TestOperation extends TestCase {
 		addItemToFile(f2a, "p", 2);
 		addItemToFile(f2b, "t", 2);
 		TestExecution ex = new TestExecution();
-		List<PError> candidateErrors = ex.testMissingKey(dirs);
+		List<PError> candidateErrors = ex.testMissingKey(execution, dirs);
 		MissingKeyError e1 = new MissingKeyError("it_IT", "b", "s", 1, "en_US");
 		List<PError> referenceErrors = new ArrayList<PError>();
 		referenceErrors.add(e1);
@@ -147,6 +151,7 @@ public class TestOperation extends TestCase {
 
 	private Configuration createConfiguration() {
 		Configuration configuration = new Configuration();
+		configuration.setPreventOutput(true);
 		return configuration;
 	}
 

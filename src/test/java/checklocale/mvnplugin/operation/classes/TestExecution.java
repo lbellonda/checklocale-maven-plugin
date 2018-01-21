@@ -23,6 +23,9 @@ import java.util.List;
 
 import checklocale.mvnplugin.operation.DirInfo;
 import checklocale.mvnplugin.operation.Execution;
+import checklocale.mvnplugin.operation.PropInfo;
+import checklocale.mvnplugin.operation.ReadInfoResult;
+import checklocale.mvnplugin.operation.SingleExecution;
 import checklocale.mvnplugin.operation.errors.PError;
 
 public class TestExecution extends Execution {
@@ -32,14 +35,31 @@ public class TestExecution extends Execution {
 	}
 
 	public String testExtractKey(final String input) {
-		return extractKey(input);
+		ReadInfoResult result = extractKey(input);
+		if ((null != result) && (null != result.getPropInfo()) && !result.isError()) {
+			PropInfo info = result.getPropInfo();
+			if (null != info) {
+				return info.getKey();
+			}
+		}
+		return null;
 	}
 
 	public List<PError> testDuplicate(List<DirInfo> dirs) {
 		return checkDuplicateItems(dirs);
 	}
 
-	public List<PError> testMissingKey(List<DirInfo> dirs) {
-		return checkMissingItems(dirs);
+	public List<PError> testMissingKey(SingleExecution execution, List<DirInfo> dirs) {
+		return checkMissingItems(execution, dirs);
+	}
+
+	public String testRewrite(String input) {
+		ReadInfoResult result = extractKey(input);
+		if ((null != result) && (null != result.getPropInfo()) && !result.isError()) {
+			StringBuilder sb = new StringBuilder();
+			result.getPropInfo().writeToString(sb);
+			return sb.toString();
+		}
+		return null;
 	}
 }

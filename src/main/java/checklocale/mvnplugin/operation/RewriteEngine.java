@@ -88,22 +88,6 @@ public class RewriteEngine {
 		sb.append("# ****existing items\n");
 		for (PropInfo propInfo : fileInfo.getItemsSorted()) {
 			writeSingleItem(propInfo, fileInfo, baseLocale, sb);
-			/*
-			 * PropInfo baseItem = null ; if(null != baseLocale) { baseItem =
-			 * baseLocale.getProperties().get(propInfo.getKey()); }
-			 * if(propInfo.hasDuplicates()) { ArrayList<PropInfo> values = new
-			 * ArrayList<PropInfo>(); for( PropInfo duplicated :
-			 * propInfo.getRedefinitions() ) { values.add(0, duplicated); }
-			 * values.add(propInfo); PropInfo selected = null ; for( PropInfo
-			 * option : values ) { if( null == selected ) { if( null != baseItem
-			 * ) { if( !option.getValue().equals(baseItem.getValue())) {
-			 * selected = option ; break; } } } } if(null == selected ) {
-			 * selected = propInfo ; } selected.writeToString(sb); for( PropInfo
-			 * option : values ) { if( option != selected ) {
-			 * sb.append("# duplicated at line "+option.getLineDefined()+"\n");
-			 * option.writeToString(sb); } } } else {
-			 * propInfo.writeToString(sb); }
-			 */
 		}
 		if (fileInfo.hasMissingItems()) {
 			sb.append("# ****missing items\n");
@@ -140,17 +124,22 @@ public class RewriteEngine {
 			if (null == selected) {
 				selected = propInfo;
 			}
-			selected.writeToString(sb);
+			writeItemLine(selected, sb);
 			for (PropInfo option : values) {
 				if (option.getLineDefined() != selected.getLineDefined()) {
 					sb.append("# duplicated at line " + option.getLineDefined() + "\n");
 					sb.append("# ");
-					option.writeToString(sb);
+					writeItemLine(option, sb);
 				}
 			}
 		} else {
-			propInfo.writeToString(sb);
+			writeItemLine(propInfo, sb);
 		}
-
 	} // writeSingleItem()
+
+	private void writeItemLine(PropInfo propInfo, StringBuilder sb) {
+		propInfo.writeToString(sb);
+		sb.append("\n");
+	} // writeItemLine()
+
 }
