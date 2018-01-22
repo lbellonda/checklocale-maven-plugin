@@ -22,8 +22,12 @@ public class InvalidEntryError extends PError {
 
 	private int lineNo;
 	private String fileName;
+	private String locale;
+	private String value;
 
-	public InvalidEntryError(String argFileName, int argLineNo) {
+	public InvalidEntryError(String argLocale, String argFileName, String argValue, int argLineNo) {
+		locale = argLocale;
+		value = argValue;
 		lineNo = argLineNo;
 		fileName = argFileName;
 	}
@@ -34,7 +38,8 @@ public class InvalidEntryError extends PError {
 
 	@Override
 	public String toString() {
-		return "Error: invalid entry file: '" + fileName + "' line:" + lineNo;
+		return "Error: invalid entry file: '" + fileName + "' locale: " + locale + " line:" + lineNo + " value:"
+				+ value;
 	}
 
 	@Override

@@ -52,7 +52,9 @@ public class TestOperationUnit extends TestCase {
 		assertEquals("abc.gg= 2jdjd", op.testRewrite("abc.gg = 2jdjd"));
 		assertEquals("abc.gg= 2jdjd", op.testRewrite(" abc.gg = 2jdjd"));
 		assertEquals("abc.gg= 2 jdjd", op.testRewrite("\ufeffabc.gg = 2 jdjd")); // bom
-		assertEquals(null, op.testRewrite(" abc 12 3"));
+		assertEquals("abc=12 3", op.testRewrite(" abc 12 3"));
+		assertEquals("abc=12 3", op.testRewrite(" abc:12 3"));
+		assertEquals(null, op.testRewrite(" abc_12_3"));
 
 	}
 }

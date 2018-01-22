@@ -267,7 +267,8 @@ public class Execution {
 				ReadInfoResult result = extractKey(entry);
 				if (null != result) {
 					if (result.isError()) {
-						InvalidEntryError error = new InvalidEntryError(fileInfo.getName(), lineNo);
+						InvalidEntryError error = new InvalidEntryError(fileInfo.getDirInfo().getLocale(),
+								fileInfo.getName(), entry, lineNo);
 						errors.add(error);
 					}
 					PropInfo propInfo = result.getPropInfo();
@@ -303,10 +304,17 @@ public class Execution {
 			rInput = rInput.substring(1);
 		}
 		String input2 = rInput.trim();
-		if (input2.startsWith("#") || input2.startsWith("!")) {
+		if (input2.startsWith("#") || input2.startsWith("!") || input2.isEmpty()) {
 			return result;
 		}
 		int indexOfSep = input2.indexOf("=");
+		if (indexOfSep < 0) {
+			indexOfSep = input2.indexOf(":");
+			if (indexOfSep < 0) {
+				indexOfSep = input2.indexOf(" ");
+			}
+		}
+
 		if (indexOfSep >= 0) {
 			String key = input2.substring(0, indexOfSep);
 			if (key.isEmpty()) {
