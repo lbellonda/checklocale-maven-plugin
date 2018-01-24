@@ -57,6 +57,7 @@ Basic usage
 +-----
 
 Minimal configuration
+
   The following is a sample of minimal configuration, only folders and goal are required, other parameter assume predefined values:
   
 +----
@@ -104,12 +105,19 @@ Configuring Plugin
   The following configuration can be applied to modify the plugin behavior:
   
   * set the base locale,
+  
   * use a specific encoding for file reading and writing,
+  
   * skip the rewrite phase,
+  
   * set the output folder,
+  
   * use the stricter syntax,
+  
   * avoid to emit errors,
+  
   * allow to embed locale code in file names.
   
+  []  
 
 []
