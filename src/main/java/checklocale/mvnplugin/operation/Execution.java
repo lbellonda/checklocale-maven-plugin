@@ -264,7 +264,7 @@ public class Execution {
 			int lineNo = 0;
 			for (String entry : lines) {
 				lineNo++;
-				ReadInfoResult result = extractKey(entry);
+				ReadInfoResult result = extractKey(entry, configuration.isStrict());
 				if (null != result) {
 					if (result.isError()) {
 						InvalidEntryError error = new InvalidEntryError(fileInfo.getDirInfo().getLocale(),
@@ -293,7 +293,7 @@ public class Execution {
 	 * @return
 	 */
 
-	protected ReadInfoResult extractKey(final String input) {
+	protected ReadInfoResult extractKey(final String input, final boolean strict) {
 		ReadInfoResult result = new ReadInfoResult();
 		result.setError(false);
 		if ((null == input) || input.isEmpty()) {
@@ -309,9 +309,11 @@ public class Execution {
 		}
 		int indexOfSep = input2.indexOf("=");
 		if (indexOfSep < 0) {
-			indexOfSep = input2.indexOf(":");
-			if (indexOfSep < 0) {
-				indexOfSep = input2.indexOf(" ");
+			if (!strict) {
+				indexOfSep = input2.indexOf(":");
+				if (indexOfSep < 0) {
+					indexOfSep = input2.indexOf(" ");
+				}
 			}
 		}
 

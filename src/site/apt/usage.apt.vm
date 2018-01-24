@@ -28,14 +28,14 @@
 ~~ http://maven.apache.org/doxia/references/apt-format.html
 
 
-Configuring Plugin
+Basic usage
 
   Create an "execution", then set the goal to "checklocale". In the configuration you can specify one optional encoding and
   a list of directories to check. Default encoding is UTF-8. An optional parameter, errors, boolean, can be used to get the report of the errors without stopping the build.
 
+  
   Here a sample of the configuration
-
-
+  
 +----
 <executions>
   <execution>
@@ -45,10 +45,30 @@ Configuring Plugin
     </goals>
      <configuration>
     	<encoding>UTF-8</encoding>
+    	<baseLocale>en_US</baseLocale>
     	<directories>
     		<directory>src/main/resources/locale</directory>
     		<directory>optional/folder2</directory>
     		<directory>optional/folder3</directory>
+    	</directories>
+    </configuration>
+  </execution>
+</executions>
++-----
+
+Minimal configuration
+  The following is a sample of minimal configuration, only folders and goal are required, other parameter assume predefined values:
+  
++----
+<executions>
+  <execution>
+   <id>one</id>
+    <goals>
+      <goal>checklocale</goal>
+    </goals>
+     <configuration>
+    	<directories>
+    		<directory>src/main/resources/locale</directory>
     	</directories>
     </configuration>
   </execution>
@@ -79,5 +99,17 @@ Listing errors as warnings
 </executions>
 +-----
 
+Configuring Plugin
+  
+  The following configuration can be applied to modify the plugin behavior:
+  
+  * set the base locale,
+  * use a specific encoding for file reading and writing,
+  * skip the rewrite phase,
+  * set the output folder,
+  * use the stricter syntax,
+  * avoid to emit errors,
+  * allow to embed locale code in file names.
+  
 
 []

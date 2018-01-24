@@ -31,6 +31,7 @@ public class Configuration {
 	private String baseLocale;
 	private boolean errors = true;
 	private boolean preventOutput = false;
+	private boolean strict = false;
 
 	public String getEncoding() {
 		return encoding;
@@ -103,4 +104,13 @@ public class Configuration {
 	public void setPreventOutput(boolean preventOutput) {
 		this.preventOutput = preventOutput;
 	}
+
+	public boolean isStrict() {
+		return strict;
+	}
+
+	public void setStrict(boolean strict) {
+		this.strict = strict;
+	}
+
 }

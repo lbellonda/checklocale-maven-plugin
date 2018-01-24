@@ -56,4 +56,8 @@ public class TestCPMojoConfig extends TestCPMojo {
 	public void setupCfgOutputDir() {
 		targetBaseDir = null;
 	}
+
+	public void setupCfgStrict() {
+		strict = true;
+	}
 }

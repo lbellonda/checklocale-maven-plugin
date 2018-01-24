@@ -24,19 +24,58 @@ import junit.framework.TestCase;
 
 public class TestOperationUnit extends TestCase {
 
-	public void testParsing() {
+	public void testParsingLax() {
 		TestExecution op = new TestExecution();
-		assertEquals(null, op.testExtractKey(null));
-		assertEquals(null, op.testExtractKey(""));
-		assertEquals(null, op.testExtractKey("="));
-		assertEquals("1", op.testExtractKey("1="));
-		assertEquals("1", op.testExtractKey("1=2"));
-		assertEquals("abc.gg", op.testExtractKey("abc.gg = 2jdjd"));
-		assertEquals("abc.gg", op.testExtractKey(" abc.gg = 2jdjd"));
-		assertEquals(null, op.testExtractKey("#"));
-		assertEquals(null, op.testExtractKey("!"));
-		assertEquals(null, op.testExtractKey("# asda=as"));
-		assertEquals(null, op.testExtractKey("! asda=as"));
+		assertEquals(null, op.testExtractKeyLax(null));
+		assertEquals(null, op.testExtractKeyLax(""));
+		assertEquals(null, op.testExtractKeyLax("="));
+		assertEquals(null, op.testExtractKeyLax("=1"));
+		assertEquals("1", op.testExtractKeyLax("1="));
+		assertEquals("1", op.testExtractKeyLax("1=2"));
+		assertEquals("abc.gg", op.testExtractKeyLax("abc.gg = 2jdjd"));
+		assertEquals("abc.gg", op.testExtractKeyLax(" abc.gg = 2jdjd"));
+		assertEquals("abc.gg", op.testExtractKeyLax(" abc.gg 2jdjd"));
+		assertEquals("abc.gg", op.testExtractKeyLax(" abc.gg :2jdjd"));
+		assertEquals(null, op.testExtractKeyLax("#"));
+		assertEquals(null, op.testExtractKeyLax("!"));
+		assertEquals(null, op.testExtractKeyLax("# asda=as"));
+		assertEquals(null, op.testExtractKeyLax("! asda=as"));
+	}
+	
+	public void testParsingStrict() {
+		TestExecution op = new TestExecution();
+		assertEquals(null, op.testExtractKeyStrict(null));
+		assertEquals(null, op.testExtractKeyStrict(""));
+		assertEquals(null, op.testExtractKeyStrict("="));
+		assertEquals("1", op.testExtractKeyStrict("1="));
+		assertEquals("1", op.testExtractKeyStrict("1=2"));
+		assertEquals(null, op.testExtractKeyStrict("=1"));
+		assertEquals("abc.gg", op.testExtractKeyStrict("abc.gg = 2jdjd"));
+		assertEquals("abc.gg", op.testExtractKeyStrict(" abc.gg = 2jdjd"));
+		assertEquals(null, op.testExtractKeyStrict(" abc.gg 2jdjd"));
+		assertEquals(null, op.testExtractKeyStrict(" abc.gg :2jdjd"));
+		assertEquals(null, op.testExtractKeyStrict("#"));
+		assertEquals(null, op.testExtractKeyStrict("!"));
+		assertEquals(null, op.testExtractKeyStrict("# asda=as"));
+		assertEquals(null, op.testExtractKeyStrict("! asda=as"));
+	}
+
+	public void testParsingStrictError() {
+		TestExecution op = new TestExecution();
+		assertEquals(false, op.testExtractKeyStrictError(null));
+		assertEquals(false, op.testExtractKeyStrictError(""));
+		assertEquals(true, op.testExtractKeyStrictError("="));
+		assertEquals(false, op.testExtractKeyStrictError("1="));
+		assertEquals(false, op.testExtractKeyStrictError("1=2"));
+		assertEquals(true, op.testExtractKeyStrictError("=1"));
+		assertEquals(false, op.testExtractKeyStrictError("abc.gg = 2jdjd"));
+		assertEquals(false, op.testExtractKeyStrictError(" abc.gg = 2jdjd"));
+		assertEquals(true, op.testExtractKeyStrictError(" abc.gg 2jdjd"));
+		assertEquals(true, op.testExtractKeyStrictError(" abc.gg :2jdjd"));
+		assertEquals(false, op.testExtractKeyStrictError("#"));
+		assertEquals(false, op.testExtractKeyStrictError("!"));
+		assertEquals(false, op.testExtractKeyStrictError("# asda=as"));
+		assertEquals(false, op.testExtractKeyStrictError("! asda=as"));
 	}
 
 	public void testRewrite() {

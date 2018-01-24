@@ -31,7 +31,7 @@
 ${project.name}
 
   The checklocale plugin is used to check if localizations stored in properties files stored in folders contain the same keys and no
-  duplicate exist.
+  duplicate exists.
   Given a set of folders, subfolders are scanned to extract the keys.
   The expected folder structure is as follows:
 
@@ -52,6 +52,13 @@ localizations
 
   Files with the same name will be compared in en_US and it_IT subfolders.
   There is the possibility to configure the plugin to report errors as warnings, to avoid blocking the build.
+  The input structure will be rewritten in the output folder normalized, so in case of errors the correct configuration can be 
+  rebuilt with minimal effort, using the files from a given locale taken as reference. If there are duplicated items in a file
+  the last item will be retained and the other ones transformed in comments, unless the item is equal to the correspnding item
+  of the base locale (the item is assumed to be untraslated). The missing items are inserted at the end of the file, where they can be easily checked. The value of the missing item is taken from the base locale, if the base locale contains it, or, if not existing in the base locale, from the first of the other locales (taken in casual order) that contains it.
+  
+  The plugin uses the syntax of property files for Java and Flex, but can be conditioned to recognize only the most common
+  form (use of equals sign as separator between key and value).
 
 * Goals Overview
 
@@ -75,7 +82,7 @@ localizations
 
 * Examples
 
-  To provide you with better understanding of some usages of the Plugin Name,
+  To provide you with better understanding of some usages of the plugin,
   you can take a look into the following examples:
 
   * {{{./examples/one.html} pom.xml of a project that uses the plugin}}

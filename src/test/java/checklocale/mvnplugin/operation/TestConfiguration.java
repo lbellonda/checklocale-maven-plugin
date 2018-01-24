@@ -70,6 +70,7 @@ public class TestConfiguration extends TestCase {
 		assertEquals("./target/" + CPMojo.DEFAULT_FOLDER, configuration.getOutputFolder());
 		assertEquals("", configuration.getBaseLocale());
 		assertEquals(false, configuration.isPreventOutput());
+		assertEquals(false, configuration.isStrict());
 		compareCollections(configuration.getDirectories(), makeList(new String[] { "locale" }));
 	}
 
@@ -84,6 +85,7 @@ public class TestConfiguration extends TestCase {
 		assertEquals("./target/" + CPMojo.DEFAULT_FOLDER, configuration.getOutputFolder());
 		assertEquals("", configuration.getBaseLocale());
 		assertEquals(false, configuration.isPreventOutput());
+		assertEquals(false, configuration.isStrict());
 		compareCollections(configuration.getDirectories(), makeList(new String[] { "locale" }));
 	}
 
@@ -112,6 +114,7 @@ public class TestConfiguration extends TestCase {
 			assertEquals("./target/" + CPMojo.DEFAULT_FOLDER, configuration.getOutputFolder());
 			assertEquals("", configuration.getBaseLocale());
 			assertEquals(false, configuration.isPreventOutput());
+			assertEquals(false, configuration.isStrict());
 			compareCollections(configuration.getDirectories(),
 					makeList(new String[] { "locale1", "locale2", "locale3" }));
 		}
@@ -140,6 +143,7 @@ public class TestConfiguration extends TestCase {
 		assertEquals("./target/" + CPMojo.DEFAULT_FOLDER, configuration.getOutputFolder());
 		assertEquals("", configuration.getBaseLocale());
 		assertEquals(true, configuration.isPreventOutput());
+		assertEquals(false, configuration.isStrict());
 		compareCollections(configuration.getDirectories(), makeList(new String[] { "locale" }));
 	}
 
@@ -154,6 +158,7 @@ public class TestConfiguration extends TestCase {
 		assertEquals("./target/" + CPMojo.DEFAULT_FOLDER, configuration.getOutputFolder());
 		assertEquals("", configuration.getBaseLocale());
 		assertEquals(false, configuration.isPreventOutput());
+		assertEquals(false, configuration.isStrict());
 		compareCollections(configuration.getDirectories(), makeList(new String[] { "locale" }));
 	}
 
@@ -168,6 +173,7 @@ public class TestConfiguration extends TestCase {
 		assertEquals("./target/" + CPMojo.DEFAULT_FOLDER, configuration.getOutputFolder());
 		assertEquals("es_ES", configuration.getBaseLocale());
 		assertEquals(false, configuration.isPreventOutput());
+		assertEquals(false, configuration.isStrict());
 		compareCollections(configuration.getDirectories(), makeList(new String[] { "locale" }));
 	}
 
@@ -182,6 +188,7 @@ public class TestConfiguration extends TestCase {
 		assertEquals("./target/" + CPMojo.DEFAULT_FOLDER, configuration.getOutputFolder());
 		assertEquals("", configuration.getBaseLocale());
 		assertEquals(false, configuration.isPreventOutput());
+		assertEquals(false, configuration.isStrict());
 		compareCollections(configuration.getDirectories(), makeList(new String[] { "locale" }));
 	}
 
@@ -196,6 +203,21 @@ public class TestConfiguration extends TestCase {
 				fail();
 			}
 		}
+	}
+	
+	public void testStrict() throws Exception {
+		TestCPMojoConfig mojo = doSetUp();
+		mojo.setupCfgStrict();
+		Configuration configuration = mojo.execSetup();
+		assertEquals(true, configuration.isErrors());
+		assertEquals("UTF-8", configuration.getEncoding());
+		assertEquals(".", configuration.getBaseDir());
+		assertEquals(false, configuration.isFileNameContainsLocaleCode());
+		assertEquals("./target/" + CPMojo.DEFAULT_FOLDER, configuration.getOutputFolder());
+		assertEquals("", configuration.getBaseLocale());
+		assertEquals(false, configuration.isPreventOutput());
+		assertEquals(true, configuration.isStrict());
+		compareCollections(configuration.getDirectories(), makeList(new String[] { "locale" }));
 	}
 
 }

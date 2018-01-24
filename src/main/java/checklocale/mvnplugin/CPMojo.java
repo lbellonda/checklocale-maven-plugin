@@ -83,6 +83,13 @@ public class CPMojo extends AbstractMojo {
 	protected boolean preventOutput = false;
 
 	/**
+	 * Flag to allow only canonical format using '#' as separator
+	 * 
+	 * @parameter strict, defaultValue = false
+	 */
+	protected boolean strict = false;
+
+	/**
 	 * Encoding of the properties
 	 * 
 	 * @parameter encoding, defaultValue = "UTF-8"
@@ -170,6 +177,7 @@ public class CPMojo extends AbstractMojo {
 
 			getLog().debug(MOJO_NAME + " parameters:");
 			getLog().debug("   errors: " + errors);
+			getLog().debug("   strict: " + strict);
 			getLog().debug("   encoding: " + encoding);
 			getLog().debug("   baseDir: " + projectBaseDir);
 			getLog().debug("   fileNameContainsLocaleCode: " + fileNameContainsLocaleCode);
@@ -203,6 +211,7 @@ public class CPMojo extends AbstractMojo {
 		checkEmptyParam(projectBaseDir, "Invalid project directory");
 		configuration.setBaseDir(cleanParam(projectBaseDir));
 		configuration.setErrors(errors);
+		configuration.setStrict(strict);
 		configuration.setFileNameContainsLocaleCode(fileNameContainsLocaleCode);
 		checkEmptyParam(targetBaseDir, "Invalid build directory");
 
