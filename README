@@ -23,7 +23,7 @@ Check Properties Maven Mojo
   The goal is checklocale and a sample usage is outlined here:
   
   			<plugin>
-				<groupId>checklocale-maven-plugin</groupId>
+				<groupId>io.github.lbellonda </groupId>
 				<artifactId>checklocale</artifactId>
 				<version>CURRENT_VERSION</version>
 				<executions>

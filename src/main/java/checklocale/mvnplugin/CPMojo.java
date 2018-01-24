@@ -176,17 +176,17 @@ public class CPMojo extends AbstractMojo {
 		if (getLog().isDebugEnabled()) {
 
 			getLog().debug(MOJO_NAME + " parameters:");
-			getLog().debug("   errors: " + errors);
-			getLog().debug("   strict: " + strict);
-			getLog().debug("   encoding: " + encoding);
-			getLog().debug("   baseDir: " + projectBaseDir);
+			getLog().debug("                       errors: " + errors);
+			getLog().debug("                       strict: " + strict);
+			getLog().debug("                     encoding: " + encoding);
+			getLog().debug("                      baseDir: " + projectBaseDir);
 			getLog().debug("   fileNameContainsLocaleCode: " + fileNameContainsLocaleCode);
-			getLog().debug("   outputFolder: " + outputFolder);
-			getLog().debug("   baseLocale: " + baseLocale);
-			getLog().debug("   targetBaseDir: " + targetBaseDir);
-			getLog().debug("   preventOutput: " + preventOutput);
+			getLog().debug("                 outputFolder: " + outputFolder);
+			getLog().debug("                   baseLocale: " + baseLocale);
+			getLog().debug("                targetBaseDir: " + targetBaseDir);
+			getLog().debug("                preventOutput: " + preventOutput);
 
-			getLog().debug("   folders:");
+			getLog().debug("                      folders:");
 			List<String> folders = getListFromFolders();
 			if ((null == directories) || (directories.length == 0)) {
 				getLog().debug(MOJO_NAME + " no folders to check.");

@@ -37,7 +37,7 @@ Sample usage
 <build>
 	<plugins>
 		<plugin>
-			<groupId>checklocale-maven-plugin</groupId>
+			<groupId>io.github.lbellonda</groupId>
 			<artifactId>checklocale</artifactId>
 			<version>1.0-SNAPSHOT</version>
 			<executions>
