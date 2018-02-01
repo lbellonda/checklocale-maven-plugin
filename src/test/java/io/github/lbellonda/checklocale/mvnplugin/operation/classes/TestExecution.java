@@ -69,6 +69,18 @@ public class TestExecution extends Execution {
 		return checkMissingItems(execution, dirs);
 	}
 
+	public String testRewriteValues(String input) {
+		ReadInfoResult result = extractKey(input, false);
+		if ((null != result) && (null != result.getPropInfo()) && !result.isError()) {
+			StringBuilder sb = new StringBuilder();
+			if(result.getPropInfo().isValue()) {
+				result.getPropInfo().writeToString(sb);
+				return sb.toString();
+			}
+		}
+		return null;
+	}
+	
 	public String testRewrite(String input) {
 		ReadInfoResult result = extractKey(input, false);
 		if ((null != result) && (null != result.getPropInfo()) && !result.isError()) {

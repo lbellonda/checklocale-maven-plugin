@@ -76,12 +76,19 @@ public class CPMojo extends AbstractMojo {
 	protected boolean errors = true;
 
 	/**
+	 * Flag to skip comments rewriting, if true no comments will be generated
+	 * 
+	 * @parameter skipComments, defaultValue = false
+	 */
+	protected boolean skipComments = false;
+
+	/**
 	 * Flag to avoid output, if true no output will be generated
 	 * 
 	 * @parameter errors, defaultValue = false
 	 */
-	protected boolean preventOutput = false;
 
+	protected boolean preventOutput = false;
 	/**
 	 * Flag to allow only canonical format using '#' as separator
 	 * 
@@ -183,6 +190,7 @@ public class CPMojo extends AbstractMojo {
 			getLog().debug("   fileNameContainsLocaleCode: " + fileNameContainsLocaleCode);
 			getLog().debug("                 outputFolder: " + outputFolder);
 			getLog().debug("                   baseLocale: " + baseLocale);
+			getLog().debug("                 skipComments: " + skipComments);
 			getLog().debug("                targetBaseDir: " + targetBaseDir);
 			getLog().debug("                preventOutput: " + preventOutput);
 
@@ -212,6 +220,7 @@ public class CPMojo extends AbstractMojo {
 		configuration.setBaseDir(cleanParam(projectBaseDir));
 		configuration.setErrors(errors);
 		configuration.setStrict(strict);
+		configuration.setSkipComments(skipComments);
 		configuration.setFileNameContainsLocaleCode(fileNameContainsLocaleCode);
 		checkEmptyParam(targetBaseDir, "Invalid build directory");
 

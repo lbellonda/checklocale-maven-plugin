@@ -60,4 +60,8 @@ public class TestCPMojoConfig extends TestCPMojo {
 	public void setupCfgStrict() {
 		strict = true;
 	}
+
+	public void setupCfgSkipComments() {
+		skipComments = true;
+	}
 }

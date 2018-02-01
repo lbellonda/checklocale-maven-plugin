@@ -28,11 +28,15 @@ public class FileInfo extends FileInfoModel {
 	}
 
 	public void addInfo(PropInfo newModel) {
-		if (properties.containsKey(newModel.getKey())) {
-			PropInfo property = properties.get(newModel.getKey());
-			property.getRedefinitions().add(newModel);
+		if(newModel.isValue()) {
+			if (properties.containsKey(newModel.getKey())) {
+				PropInfo property = properties.get(newModel.getKey());
+				property.getRedefinitions().add(newModel);
+			} else {
+				properties.put(newModel.getKey(), newModel);
+				itemsSorted.add(newModel);
+			}
 		} else {
-			properties.put(newModel.getKey(), newModel);
 			itemsSorted.add(newModel);
 		}
 	}

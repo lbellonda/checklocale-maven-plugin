@@ -41,7 +41,7 @@ public class TestOperationUnit extends TestCase {
 		assertEquals(null, op.testExtractKeyLax("# asda=as"));
 		assertEquals(null, op.testExtractKeyLax("! asda=as"));
 	}
-	
+
 	public void testParsingStrict() {
 		TestExecution op = new TestExecution();
 		assertEquals(null, op.testExtractKeyStrict(null));
@@ -78,14 +78,32 @@ public class TestOperationUnit extends TestCase {
 		assertEquals(false, op.testExtractKeyStrictError("! asda=as"));
 	}
 
+	public void testRewriteValues() {
+		TestExecution op = new TestExecution();
+		assertEquals(null, op.testRewriteValues(null));
+		assertEquals(null, op.testRewriteValues(""));
+		assertEquals(null, op.testRewriteValues("!"));
+		assertEquals(null, op.testRewriteValues("#"));
+		assertEquals(null, op.testRewriteValues("# abc =12 3"));
+		assertEquals(null, op.testRewriteValues("! abc =12 3"));
+		assertEquals("1=", op.testRewriteValues("1="));
+		assertEquals("1=2", op.testRewriteValues("1=2"));
+		assertEquals("abc.gg= 2jdjd", op.testRewriteValues("abc.gg = 2jdjd"));
+		assertEquals("abc.gg= 2jdjd", op.testRewriteValues(" abc.gg = 2jdjd"));
+		assertEquals("abc.gg= 2 jdjd", op.testRewriteValues("\ufeffabc.gg = 2 jdjd")); // bom
+		assertEquals("abc=12 3", op.testRewriteValues(" abc 12 3"));
+		assertEquals("abc=12 3", op.testRewriteValues(" abc:12 3"));
+		assertEquals(null, op.testRewriteValues(" abc_12_3"));
+	}
+
 	public void testRewrite() {
 		TestExecution op = new TestExecution();
 		assertEquals(null, op.testRewrite(null));
-		assertEquals(null, op.testRewrite(""));
-		assertEquals(null, op.testRewrite("!"));
-		assertEquals(null, op.testRewrite("#"));
-		assertEquals(null, op.testRewrite("# abc =12 3"));
-		assertEquals(null, op.testRewrite("! abc =12 3"));
+		assertEquals("", op.testRewrite(""));
+		assertEquals("#", op.testRewrite("!"));
+		assertEquals("#", op.testRewrite("#"));
+		assertEquals("# abc =12 3", op.testRewrite("# abc =12 3"));
+		assertEquals("# abc =12 3", op.testRewrite("! abc =12 3"));
 		assertEquals("1=", op.testRewrite("1="));
 		assertEquals("1=2", op.testRewrite("1=2"));
 		assertEquals("abc.gg= 2jdjd", op.testRewrite("abc.gg = 2jdjd"));
@@ -94,6 +112,5 @@ public class TestOperationUnit extends TestCase {
 		assertEquals("abc=12 3", op.testRewrite(" abc 12 3"));
 		assertEquals("abc=12 3", op.testRewrite(" abc:12 3"));
 		assertEquals(null, op.testRewrite(" abc_12_3"));
-
 	}
 }

@@ -114,13 +114,15 @@ public class Execution {
 	protected List<PError> checkDuplicateItems(FileInfo fileInfo) {
 		List<PError> errors = new ArrayList<PError>();
 		for (PropInfo propInfo : fileInfo.getProperties().values()) {
-			if (!propInfo.getRedefinitions().isEmpty()) {
-				DuplicateKeyError duplicateKeyError = new DuplicateKeyError(fileInfo.getFolderName(),
-						fileInfo.getName(), propInfo.getKey(), propInfo.getLineDefined());
-				for (PropInfo redefinition : propInfo.getRedefinitions()) {
-					duplicateKeyError.addRedefinition(redefinition.getLineDefined());
+			if (propInfo.isValue()) {
+				if (!propInfo.getRedefinitions().isEmpty()) {
+					DuplicateKeyError duplicateKeyError = new DuplicateKeyError(fileInfo.getFolderName(),
+							fileInfo.getName(), propInfo.getKey(), propInfo.getLineDefined());
+					for (PropInfo redefinition : propInfo.getRedefinitions()) {
+						duplicateKeyError.addRedefinition(redefinition.getLineDefined());
+					}
+					errors.add(duplicateKeyError);
 				}
-				errors.add(duplicateKeyError);
 			}
 		}
 		return errors;
@@ -296,15 +298,25 @@ public class Execution {
 	protected ReadInfoResult extractKey(final String input, final boolean strict) {
 		ReadInfoResult result = new ReadInfoResult();
 		result.setError(false);
-		if ((null == input) || input.isEmpty()) {
+		if (null == input) {
 			return result;
 		}
 		String rInput = input;
-		if (rInput.charAt(0) == '\ufeff') {
-			rInput = rInput.substring(1);
+		if (!rInput.isEmpty()) {
+			if (rInput.charAt(0) == '\ufeff') {
+				rInput = rInput.substring(1);
+			}
 		}
 		String input2 = rInput.trim();
-		if (input2.startsWith("#") || input2.startsWith("!") || input2.isEmpty()) {
+		if (input2.isEmpty()) {
+			PropInfoEmpty propInfo = new PropInfoEmpty();
+			result.setPropInfo(propInfo);
+			return result;
+		}
+		if (input2.startsWith("#") || input2.startsWith("!")) {
+			PropInfoComment propInfo = new PropInfoComment();
+			propInfo.setValue(input2.substring(1));
+			result.setPropInfo(propInfo);
 			return result;
 		}
 		int indexOfSep = input2.indexOf("=");

@@ -67,6 +67,7 @@ public class TestConfiguration extends TestCase {
 		assertEquals("UTF-8", configuration.getEncoding());
 		assertEquals(".", configuration.getBaseDir());
 		assertEquals(false, configuration.isFileNameContainsLocaleCode());
+		assertEquals(false, configuration.isSkipComments());
 		assertEquals("./target/" + CPMojo.DEFAULT_FOLDER, configuration.getOutputFolder());
 		assertEquals("", configuration.getBaseLocale());
 		assertEquals(false, configuration.isPreventOutput());
@@ -82,6 +83,7 @@ public class TestConfiguration extends TestCase {
 		assertEquals("ISO-8859-1", configuration.getEncoding());
 		assertEquals(".", configuration.getBaseDir());
 		assertEquals(false, configuration.isFileNameContainsLocaleCode());
+		assertEquals(false, configuration.isSkipComments());
 		assertEquals("./target/" + CPMojo.DEFAULT_FOLDER, configuration.getOutputFolder());
 		assertEquals("", configuration.getBaseLocale());
 		assertEquals(false, configuration.isPreventOutput());
@@ -111,6 +113,7 @@ public class TestConfiguration extends TestCase {
 			assertEquals("UTF-8", configuration.getEncoding());
 			assertEquals(".", configuration.getBaseDir());
 			assertEquals(false, configuration.isFileNameContainsLocaleCode());
+			assertEquals(false, configuration.isSkipComments());
 			assertEquals("./target/" + CPMojo.DEFAULT_FOLDER, configuration.getOutputFolder());
 			assertEquals("", configuration.getBaseLocale());
 			assertEquals(false, configuration.isPreventOutput());
@@ -140,6 +143,7 @@ public class TestConfiguration extends TestCase {
 		assertEquals("UTF-8", configuration.getEncoding());
 		assertEquals(".", configuration.getBaseDir());
 		assertEquals(false, configuration.isFileNameContainsLocaleCode());
+		assertEquals(false, configuration.isSkipComments());
 		assertEquals("./target/" + CPMojo.DEFAULT_FOLDER, configuration.getOutputFolder());
 		assertEquals("", configuration.getBaseLocale());
 		assertEquals(true, configuration.isPreventOutput());
@@ -155,6 +159,7 @@ public class TestConfiguration extends TestCase {
 		assertEquals("UTF-8", configuration.getEncoding());
 		assertEquals(".", configuration.getBaseDir());
 		assertEquals(true, configuration.isFileNameContainsLocaleCode());
+		assertEquals(false, configuration.isSkipComments());
 		assertEquals("./target/" + CPMojo.DEFAULT_FOLDER, configuration.getOutputFolder());
 		assertEquals("", configuration.getBaseLocale());
 		assertEquals(false, configuration.isPreventOutput());
@@ -185,6 +190,7 @@ public class TestConfiguration extends TestCase {
 		assertEquals("UTF-8", configuration.getEncoding());
 		assertEquals(".", configuration.getBaseDir());
 		assertEquals(false, configuration.isFileNameContainsLocaleCode());
+		assertEquals(false, configuration.isSkipComments());
 		assertEquals("./target/" + CPMojo.DEFAULT_FOLDER, configuration.getOutputFolder());
 		assertEquals("", configuration.getBaseLocale());
 		assertEquals(false, configuration.isPreventOutput());
@@ -213,6 +219,7 @@ public class TestConfiguration extends TestCase {
 		assertEquals("UTF-8", configuration.getEncoding());
 		assertEquals(".", configuration.getBaseDir());
 		assertEquals(false, configuration.isFileNameContainsLocaleCode());
+		assertEquals(false, configuration.isSkipComments());
 		assertEquals("./target/" + CPMojo.DEFAULT_FOLDER, configuration.getOutputFolder());
 		assertEquals("", configuration.getBaseLocale());
 		assertEquals(false, configuration.isPreventOutput());
@@ -220,4 +227,19 @@ public class TestConfiguration extends TestCase {
 		compareCollections(configuration.getDirectories(), makeList(new String[] { "locale" }));
 	}
 
+	public void testSkipComments() throws Exception {
+		TestCPMojoConfig mojo = doSetUp();
+		mojo.setupCfgSkipComments();
+		Configuration configuration = mojo.execSetup();
+		assertEquals(true, configuration.isErrors());
+		assertEquals("UTF-8", configuration.getEncoding());
+		assertEquals(".", configuration.getBaseDir());
+		assertEquals(false, configuration.isFileNameContainsLocaleCode());
+		assertEquals(true, configuration.isSkipComments());
+		assertEquals("./target/" + CPMojo.DEFAULT_FOLDER, configuration.getOutputFolder());
+		assertEquals("", configuration.getBaseLocale());
+		assertEquals(false, configuration.isPreventOutput());
+		assertEquals(false, configuration.isStrict());
+		compareCollections(configuration.getDirectories(), makeList(new String[] { "locale" }));
+	}
 }

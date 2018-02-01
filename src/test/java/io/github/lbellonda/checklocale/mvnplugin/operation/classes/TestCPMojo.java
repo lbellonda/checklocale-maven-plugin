@@ -44,6 +44,7 @@ public class TestCPMojo extends CPMojo {
 		outputFolder = null;
 		projectBaseDir = TestEndToEnd.BASE_SRC;
 		targetBaseDir = TestEndToEnd.BASE_OUTPUT;
+		skipComments = false;
 		preventOutput = false;
 	}
 
@@ -75,6 +76,12 @@ public class TestCPMojo extends CPMojo {
 		if ("2".equals(caseNo)) {
 			encoding = "ISO-8859-1";
 		}
+		if ("8".equals(caseNo)) {
+			baseLocale = null;
+		}
+		if ("10".equals(caseNo)) {
+			skipComments = true;
+		}
 	}
 
 	public void setupDefaultParameters(final String baseDir) {
@@ -86,6 +93,7 @@ public class TestCPMojo extends CPMojo {
 		baseLocale = null;
 		targetBaseDir = baseDir + "/target";
 		preventOutput = false;
+		skipComments = false;
 		directories = new String[] { "locale" };
 	}
 

@@ -32,4 +32,16 @@ public class PropInfo extends PropInfoModel {
 		sb.append("=");
 		sb.append(getValue());
 	}
+	
+	public boolean isValue() {
+		return true ;
+	}
+
+	public boolean isComment() {
+		return false ;
+	}
+
+	public boolean isEmpty() {
+		return false ;
+	}
 }

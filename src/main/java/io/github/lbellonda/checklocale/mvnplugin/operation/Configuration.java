@@ -32,6 +32,7 @@ public class Configuration {
 	private boolean errors = true;
 	private boolean preventOutput = false;
 	private boolean strict = false;
+	private boolean skipComments = false;
 
 	public String getEncoding() {
 		return encoding;
@@ -111,6 +112,14 @@ public class Configuration {
 
 	public void setStrict(boolean strict) {
 		this.strict = strict;
+	}
+
+	public boolean isSkipComments() {
+		return skipComments;
+	}
+
+	public void setSkipComments(boolean skipComments) {
+		this.skipComments = skipComments;
 	}
 
 }

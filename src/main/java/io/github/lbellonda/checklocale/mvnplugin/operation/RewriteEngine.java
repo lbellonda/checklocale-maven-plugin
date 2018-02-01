@@ -74,7 +74,8 @@ public class RewriteEngine {
 
 	private void writeSingleLocale(SingleExecution execution, File folder, FileInfo fileInfo, FileInfo baseLocale) {
 		StringBuilder sb = new StringBuilder();
-		writeSingleLocale(fileInfo, baseLocale, sb);
+		writeSingleLocale(execution.getConfiguration().getEncoding(), fileInfo, baseLocale, sb,
+				execution.getConfiguration().isSkipComments());
 		File outputFile = new File(folder, fileInfo.getName());
 		try {
 			FileUtils.writeStringToFile(outputFile, sb.toString(), execution.getConfiguration().getEncoding());
@@ -83,22 +84,28 @@ public class RewriteEngine {
 		}
 	}
 
-	private void writeSingleLocale(FileInfo fileInfo, FileInfo baseLocale, StringBuilder sb) {
-		sb.append("# automatically written\n");
+	private void writeSingleLocale(final String encoding, FileInfo fileInfo, FileInfo baseLocale, StringBuilder sb,
+			final boolean isSkipComments) {
+		sb.append("# automatically written, encoding:" + encoding + ", baseLocale:"
+				+ (null == baseLocale ? "unspecified" : baseLocale.getDirInfo().getLocale()) + "\n");
 		sb.append("# ****existing items\n");
 		for (PropInfo propInfo : fileInfo.getItemsSorted()) {
-			writeSingleItem(propInfo, fileInfo, baseLocale, sb);
+			writeSingleItem(propInfo, fileInfo, baseLocale, sb, isSkipComments);
 		}
 		if (fileInfo.hasMissingItems()) {
 			sb.append("# ****missing items\n");
 			for (PropInfo missingInfo : fileInfo.getMissingItems().values()) {
-				writeSingleItem(missingInfo, fileInfo, null, sb);
+				writeSingleItem(missingInfo, fileInfo, null, sb, false);
 			}
 		}
 
 	} // writeSingleLocale()
 
-	private void writeSingleItem(PropInfo propInfo, FileInfo fileInfo, FileInfo baseLocale, StringBuilder sb) {
+	private void writeSingleItem(PropInfo propInfo, FileInfo fileInfo, FileInfo baseLocale, StringBuilder sb,
+			final boolean isSkipComments) {
+		if (!propInfo.isValue() && isSkipComments) {
+			return;
+		}
 
 		PropInfo baseItem = null;
 		if (null != baseLocale) {

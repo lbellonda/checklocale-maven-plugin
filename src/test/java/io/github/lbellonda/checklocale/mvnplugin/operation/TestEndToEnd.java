@@ -37,9 +37,6 @@ public class TestEndToEnd extends TestCase {
 	public final static String BASE_REFERENCE = "src/test/resources/endToEnd/reference/";
 
 	private void compareDirectoriesRecursive(File dirReference, File dirCandidate) throws IOException {
-		if (null == dirReference) { // git...
-
-		}
 		File[] filesReference = dirReference.listFiles();
 		File[] filesCandidate = dirCandidate.listFiles();
 		if (null == filesReference) { // git...
@@ -86,7 +83,7 @@ public class TestEndToEnd extends TestCase {
 	public void testCase0() throws Exception {
 		runCase("0", false);
 	}
-
+	
 	// no output
 	public void testCase1() throws Exception {
 		runCase("1", false);
@@ -120,5 +117,20 @@ public class TestEndToEnd extends TestCase {
 	// no localizations
 	public void testCase7() throws Exception {
 		runCase("7", true);
+	}
+	
+	// regular no base locale
+	public void testCase8() throws Exception {
+		runCase("8", false);
+	}
+	
+	// regular comments
+	public void testCase9() throws Exception {
+		runCase("9", false);
+	}
+	
+	// regular no comments
+	public void testCase10() throws Exception {
+		runCase("10", false);
 	}
 }
