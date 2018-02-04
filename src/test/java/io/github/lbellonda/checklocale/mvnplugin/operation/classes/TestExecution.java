@@ -90,4 +90,12 @@ public class TestExecution extends Execution {
 		}
 		return null;
 	}
+	
+	public PropInfo testPropInfo(String input) {
+		ReadInfoResult result = extractKey(input, false);
+		if ((null != result) && (null != result.getPropInfo()) && !result.isError()) {
+			return result.getPropInfo();
+		}
+		return null;
+	}
 }

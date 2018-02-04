@@ -113,4 +113,34 @@ public class TestOperationUnit extends TestCase {
 		assertEquals("abc=12 3", op.testRewrite(" abc:12 3"));
 		assertEquals(null, op.testRewrite(" abc_12_3"));
 	}
+
+	private void checkType(TestExecution op, final String test, final boolean isValid, final boolean isComment,
+			final boolean isEmpty) {
+		final PropInfo pi = op.testPropInfo(test);
+		final boolean thisIsValid = (pi != null);
+		assertEquals("isvalid", thisIsValid, isValid);
+		if (isValid) {
+			assertEquals("isComment", pi.isComment(), isComment);
+			assertEquals("isEmpty", pi.isEmpty(), isEmpty);
+			assertEquals("isValue", pi.isValue(), !(isEmpty || isComment));
+		}
+	}
+
+	public void testType() {
+		TestExecution op = new TestExecution();
+		checkType(op, null, false, false, false);
+		checkType(op, "", true, false, true);
+		checkType(op, "!", true, true, false);
+		checkType(op, "#", true, true, false);
+		checkType(op, "# abc =12 3", true, true, false);
+		checkType(op, "! abc =12 3", true, true, false);
+		checkType(op, "1=", true, false, false);
+		checkType(op, "1=2", true, false, false);
+		checkType(op, "abc.gg = 2jdjd", true, false, false);
+		checkType(op, " abc.gg = 2jdjd", true, false, false);
+		checkType(op, "\ufeffabc.gg = 2 jdjd", true, false, false);
+		checkType(op, " abc 12 3", true, false, false);
+		checkType(op, " abc:12 3", true, false, false);
+		checkType(op, " abc_12_3", false, false, false);
+	}
 }
