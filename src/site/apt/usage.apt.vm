@@ -118,6 +118,8 @@ Configuring Plugin
   
   * allow to embed locale code in file names.
   
+  * transport comments from the source files to the rewritten ones
+  
   []  
 
 []
